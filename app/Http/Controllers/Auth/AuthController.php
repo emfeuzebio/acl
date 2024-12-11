@@ -9,6 +9,7 @@ use Illuminate\Http\Response;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 
@@ -144,12 +145,15 @@ class AuthController extends Controller
          */
 
         try {
-            // insere o novo Usuário na tabela Users
+            // PASSO 1 - Inserir o novo Usuário na tabela Users
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
             ]);
+
+            // PASSO 2 - Conceder o Perfil de Acesso padrão (3-Usuário) ao Usuário recém criado
+            $result = DB::insert('INSERT INTO acl_perfil_user ( user_id, perfil_id) VALUES ( ?, ? )', [$user->id, 3]);
 
             // Um usuário é criado na tabela Users
             return response()->json(['message' => 'Usuário registrado com sucesso'], Response::HTTP_CREATED);  // 201
