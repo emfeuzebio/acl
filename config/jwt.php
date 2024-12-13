@@ -101,8 +101,7 @@ return [
     |
     */
 
-    // 'ttl' => env('JWT_TTL', 60),  // Expiração em minutos
-    'ttl' => env('JWT_TTL', 5),  // Expiração em minutos
+    'ttl' => env('JWT_TTL', 60),  // Expiração em minutos
 
     /*
     |--------------------------------------------------------------------------
