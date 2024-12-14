@@ -143,7 +143,7 @@ Route::post('/login', function(Request $request) {
 
     // Recupera as permissões (abilities) do usuário
     // $abilities = $user->getPermissionsViaRoles()->pluck('name')->toArray();   
-    // $abilities = 'organizacao.index,organizacao.show,organizacao.edit'; 
+    // $abilities = 'organizacao.index,organizacao.show,organizacao.update'; 
 
     /**
      * Ver a resposta do chatGPT

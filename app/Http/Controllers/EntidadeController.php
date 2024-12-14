@@ -77,8 +77,8 @@ class EntidadeController extends Controller
                 // PASSO 2 - Sendo um INSERT, vamos inserir as respectivas Rotas Padrão filhas na Entidade
                 if ($Entidade->wasRecentlyCreated) {           
                     // $user->roles()->attach($request->input('roles'));
-                    $acoes = ['index','show','edit','store','destroy'];
-                    $descricoes = ['Listar','Ver','Editar','Salvar','Excluir'];
+                    $acoes = ['index','show','update','store','destroy'];
+                    $descricoes = ['Listar','Ver','Atualizar','Salvar','Excluir'];
     
                     foreach($acoes as $key => $acao) {
                         Rota::create([

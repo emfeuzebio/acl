@@ -30,8 +30,8 @@ class ACL_PermissaosSeeder extends Seeder
             ],
             [
                 'entidade_id' => '1',
-                'rota' => 'entidade.edit',
-                'descricao' => 'Editar Entidade',
+                'rota' => 'entidade.update',
+                'descricao' => 'Atualizar Entidade',
                 'ativo' => 'SIM',
             ],
             [
@@ -67,8 +67,8 @@ class ACL_PermissaosSeeder extends Seeder
             ],
             [
                 'entidade_id' => '2',
-                'rota' => 'perfil.edit',
-                'descricao' => 'Editar Perfil',
+                'rota' => 'perfil.update',
+                'descricao' => 'Atualizar Perfil',
                 'ativo' => 'SIM',
             ],
             [
@@ -98,8 +98,8 @@ class ACL_PermissaosSeeder extends Seeder
             ],
             [
                 'entidade_id' => '3',
-                'rota' => 'permissao.edit',
-                'descricao' => 'Editar Permissão',
+                'rota' => 'permissao.update',
+                'descricao' => 'Atualizar Permissão',
                 'ativo' => 'SIM',
             ],
             [

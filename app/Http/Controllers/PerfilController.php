@@ -7,6 +7,7 @@ use App\Models\Autorizacao;
 use App\Models\Entidade;
 use Yajra\DataTables\Facades\DataTables;
 use App\Models\Perfil;
+use Illuminate\Support\Str;
 use App\Models\Permissao;
 use App\Models\Rota;
 use Exception;
@@ -120,7 +121,7 @@ class PerfilController extends Controller
                     'perfil_id' => $request->perfil_id,
                     'entidade_id' => $request->entidade_id,
                     'rota_id' => $rota->id,
-                    'ativo' => 'NÃO',
+                    'ativo' => ( Str::contains($rota->rota, '.index') ? 'SIM' : 'NÃO'),
                 ]);  
             }
 
