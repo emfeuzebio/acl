@@ -104,11 +104,11 @@ class AuthController extends Controller
 
         $payload = [
             "sub" => $user->id,                             // ID do usuário
-            'iss' => 'http://example.org',                  // emissor do token
-            'aud' => 'http://apieventos.voluntary.com.br',  // Audience (público-alvo) do token
+            'iss' => 'https://acl.voluntary.com.br',        // emissor do token
+            'aud' => 'http://apifeb.voluntary.com.br',      // Audience (público-alvo) do token
             'iat' => 1356999524,                            // Data de emissão
             'nbf' => 1357000000,                            // Data de expiração
-            'exp' => now()->addMinutes(15)->timestamp,      // Define a expiração para 10 minutos
+            'exp' => now()->addMinutes(env('JWT_TTL', 60))->timestamp, // Define a expiração como a do .ENV senão será default 60 min
             'user' => $user,                                // Carrega (objeto) User com seus relacionamentos no Payload 
             'abilities' => $abilities,                      // Carrega array de "abilities" do usuário no payload ["user.index","user.show"]
             'roles' => $perfis,                             // Carrega array de "Perfis" (Roles) do usuário no payload ["10","11"]
