@@ -70,12 +70,37 @@ class AuthController extends Controller
 
         // pega o Usuário Logado acima
         $user = Auth::user();
+        $user = User::find(Auth::id());
+        $user->load('perfis');                                      // carrega os Perfis (Roles) associados ao Usuário atual
+        // dd($user->perfis);
 
-        // assim estou pegando as abilities do user vindas do ACL
-        $abilities = Gate::abilities();
-        $simplifiedAbilities = array_keys($abilities);  // transforma num array padrão abilities ex. "abilities": ["user.index","user.show"]
+        // $perfis = $user->perfis->pluck('nome', 'id')->toArray();    // cria um array com id na chave e nome no valor arrancado da Collection
+        // dd($perfis);
+
+        // Vamos obter todas abilities (autorizacoes ATIVAS) do user vindas do ACL
+        $sql = "
+            SELECT 
+                  acl_perfil_user.user_id
+                , acl_autorizacaos.perfil_id
+                , acl_autorizacaos.ativo   
+                , acl_rotas.*
+            FROM acl_perfil_user 
+                INNER JOIN acl_autorizacaos ON acl_autorizacaos.perfil_id = acl_perfil_user.perfil_id
+                INNER JOIN acl_rotas ON acl_rotas.id = acl_autorizacaos.rota_id
+            WHERE acl_autorizacaos.ativo = 'SIM'
+                AND user_id = ?
+            ORDER BY acl_rotas.rota
+        ";        
+        $autorizacoes = DB::select($sql,[$user->id]);
+
+        // Extrair num array os valores de 'perfil_id' e remover duplicados e reindexar as chaves
+        $colecao = collect($autorizacoes);
+        $perfis = $colecao->pluck('perfil_id')->unique()->values()->toArray();
+        // dd($perfis);
+
+        // Extrair num array os valores da 'rota' sem duplicados e reindexar as chaves
+        $abilities = $colecao->pluck('rota')->unique()->values()->toArray();
         // dd($abilities);
-        // dd($simplifiedAbilities);
 
         $payload = [
             "sub" => $user->id,                             // ID do usuário
@@ -84,9 +109,9 @@ class AuthController extends Controller
             'iat' => 1356999524,                            // Data de emissão
             'nbf' => 1357000000,                            // Data de expiração
             'exp' => now()->addMinutes(15)->timestamp,      // Define a expiração para 10 minutos
-            'user' => $user,                                // inserido o User no Payload
-            'abilities' => $simplifiedAbilities,            // ex. "abilities": ["user.index","user.show"]
-            // 'roles' => ["admin","sgtte","SuperAdmin"]
+            'user' => $user,                                // Carrega (objeto) User com seus relacionamentos no Payload 
+            'abilities' => $abilities,                      // Carrega array de "abilities" do usuário no payload ["user.index","user.show"]
+            'roles' => $perfis,                             // Carrega array de "Perfis" (Roles) do usuário no payload ["10","11"]
         ];
 
         // Cria o token JWT com o payload personalizado usando as definicoes do config/jwt.php 

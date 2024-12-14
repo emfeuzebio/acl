@@ -12,14 +12,14 @@ class Viagem extends Model
     protected $table = 'eve_viagens';
 
     // Viagem é FILHO de Veiculo. Relacionamento "muitos para um": "Um Veículo pertence a muitas Viagens"
-    public function veiculo()
-    {
-        return $this->belongsTo(Veiculo::class);
-    }    
+    // public function veiculo()
+    // {
+    //     return $this->belongsTo(Veiculo::class);
+    // }    
 
     // Viagem é FILHO de Trajeto. Relacionamento "muitos para um": "Um Trajeto pertence a muitas Viagens"
-    public function trajeto()
-    {
-        return $this->belongsTo(Trajeto::class);
-    }    
+    // public function trajeto()
+    // {
+    //     return $this->belongsTo(Trajeto::class);
+    // }    
 }
