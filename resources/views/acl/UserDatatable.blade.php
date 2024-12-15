@@ -273,8 +273,8 @@
                 // alert(id);
 
                 $.ajax({
-                    type: "POST",
-                    url: "{{url("user/edit")}}",
+                    type: "GET",
+                    url: "{{url("user/show")}}",
                     data: {"id": id},
                     dataType: 'json',
                     success: function (data) {

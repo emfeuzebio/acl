@@ -344,7 +344,7 @@
                 // alert($(this).parents('tr').find('td:eq(1)').text());
 
                 $.ajax({
-                    type: "POST",
+                    type: "GET",
                     url: "{{url("entidade/show")}}",
                     data: {"perfil_id":perfil_id, "id": id},
                     dataType: 'json',
@@ -488,7 +488,7 @@
                 // alert('btnNovoEntidade ' + id);
 
                 $.ajax({
-                    type: "POST",
+                    type: "GET",
                     url: "{{url("entidade/list")}}",
                     data: {"id": id},
                     dataType: 'json',
@@ -651,8 +651,8 @@
                 const id = $(this).parents('tr').attr("id");
 
                 $.ajax({
-                    type: "POST",
-                    url: "{{url("perfil/edit")}}",
+                    type: "GET",
+                    url: "{{url("perfil/show")}}",
                     data: {"id": id},
                     dataType: 'json',
                     success: function (data) {

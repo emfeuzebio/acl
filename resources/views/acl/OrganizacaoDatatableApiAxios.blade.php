@@ -38,7 +38,6 @@
                         </div>
                                                 
                         <div class="col-md-3 text-right">
-                            <button id="btnTeste"   class="btn btn-default btn-sm btnTeste" data-toggle="tooltip" title="Testes">Testes</button>
                             <button id="btnRefresh" class="btn btn-default btn-sm btnRefresh" data-toggle="tooltip" title="Atualizar a tabela (Alt+R)">Refresh</button>
                             <button id="btnNovo"    class="btn btn-success btn-sm btnNovo" data-toggle="tooltip" title="Adicionar um novo registro (Alt+N)" >Inserir Novo</button>
                         </div>
@@ -155,36 +154,6 @@
         $(document).ready(function () {
 
             var id = '';
-
-            $('#btnTeste').on("click", function (e) {
-                e.stopImmediatePropagation();
-
-                $credentials = {
-                    'email': 'emfeuzebio@hotmail.com',
-                    'password' : '12345678',
-                };
-
-                // alert('btnTeste');
-                // axios.get('https://apieventos.voluntary.com.br/api/trajeto', {
-                axios.post('https://apieventos.voluntary.com.br/api/login', $credentials, {
-                    headers: {
-                        'accept': 'application/json',  
-                        'Content-Type': 'application/json',  
-                        'Authorization': 'Bearer 8678926e944728a6b3233f44ceb4c5b074c861fd96f706159df19fb73f5fabaf',
-                        // 'Authorization': 'Bearer 19|HUm7ao29lyhtDjo9BGKwL8DbbbNl22i79cIvURn07c5bfa08',
-                    }
-                }).then(response => {
-
-                    // $('#id').val(response.data.id);
-                    console.log(response.data);
- 
-                }).catch(error => {
-
-                    // console.log(error.response);
-                    // console.log(error.request);
-                });                  
-            });              
-
 
             // validar o X-CSRF-TOKEN
             $.ajaxSetup({

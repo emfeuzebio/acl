@@ -49,8 +49,6 @@ class PerfilController extends Controller
         // }
         // die('');
 
-
-
         // $data = DataTables::eloquent(Perfil::with('entidades'))
         //     ->filter(function ($query) { $query->where('id', '>=', "1");}, true)        
         //     ->setRowId( function($param) { return $param->id; })
@@ -145,7 +143,7 @@ class PerfilController extends Controller
         return Response()->json($EntidadePerfil);
     }        
 
-    public function edit(Request $request)
+    public function show(Request $request)
     {        
         $Perfil = Perfil::where('id',$request->id)->first();
         return Response()->json($Perfil);

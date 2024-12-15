@@ -142,7 +142,7 @@
                                     <tr>
                                         <th>#</th>
                                         <th>Rota</th>
-                                        <th>Descrição</th>
+                                        <th>Ação</th>
                                         <th>Ações</th>
                                     </tr>
                                 </thead>
@@ -324,8 +324,8 @@
                 // alert(id);
 
                 $.ajax({
-                    type: "POST",
-                    url: "{{url("entidade/edit")}}",
+                    type: "GET",
+                    url: "{{url("entidade/show")}}",
                     data: {"id": id},
                     dataType: 'json',
                     success: function (data) {
@@ -528,7 +528,7 @@
                 // alert(rota_nome);
 
                 $.ajax({
-                    type: "POST",
+                    type: "GET",
                     url: "{{url("entidade/rotas")}}",
                     data: {"id": id},
                     dataType: 'json',

@@ -71,7 +71,7 @@ class UserController extends Controller
         return Response()->json(['sucesso' => $result]);
     }
 
-    public function edit(Request $request)
+    public function show(Request $request)
     {        
         $User = User::where('id',$request->id)->first();
         return Response()->json($User);

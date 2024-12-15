@@ -326,15 +326,24 @@ return [
         // ],
         ['header' => 'account_settings'],
         [
-            'text' => 'API Veículos',
-            'url' => 'api',
+            'text' => 'Usuários',
+            'url' => 'user',
             'icon' => 'fas fa-fw fa-user',
-            // 'text' => 'profile',
             // 'url' => 'admin/settings',
         ],
         [
-            'text' => 'Usuários',
-            'url' => 'user',
+            'text' => 'Perfis de Acesso',
+            'url' => 'perfil',
+            'icon' => 'fas fa-fw fa-user',
+        ],
+        [
+            'text' => 'Entidades e Rotas',
+            'url' => 'entidade',
+            'icon' => 'fas fa-fw fa-user',
+        ],
+        [
+            'text' => 'Sistemas',
+            'url' => 'sistema',
             'icon' => 'fas fa-fw fa-user',
             // 'text' => 'profile',
             // 'url' => 'admin/settings',
@@ -346,21 +355,20 @@ return [
             // 'text' => 'profile',
             // 'url' => 'admin/settings',
         ],
+        // Separador
+        ['header' => '-----------'],        
         [
-            'text' => 'Perfil de Acesso',
-            'url' => 'perfil',
+            'text' => 'Organizações APIEVENTOS',
+            'url' => 'organizacao',
             'icon' => 'fas fa-fw fa-user',
+            // 'text' => 'profile',
+            // 'url' => 'admin/settings',
         ],
-        [
-            'text' => 'Entidades e Rotas',
-            'url' => 'entidade',
-            'icon' => 'fas fa-fw fa-user',
-        ],
-        [
-            'text' => 'change_password',
-            'url' => 'admin/settings',
-            'icon' => 'fas fa-fw fa-lock',
-        ],
+        // [
+        //     'text' => 'change_password',
+        //     'url' => 'admin/settings',
+        //     'icon' => 'fas fa-fw fa-lock',
+        // ],
         // [
         //     'text' => 'multilevel',
         //     'icon' => 'fas fa-fw fa-share',
