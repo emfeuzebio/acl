@@ -8,6 +8,7 @@ use App\Http\Controllers\JwtController;
 use App\Http\Controllers\OrganizacaoController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\RotaController;
+use App\Http\Controllers\SistemaController;
 use App\Http\Controllers\UserController;
 use App\Http\Requests\OrganizacaoRequest;
 use Illuminate\Support\Facades\Auth;
@@ -120,7 +121,16 @@ Auth::routes();
                 Route::post('autorizacao/destroy', 'destroy')->name('autorizacao.destroy');
                 Route::post('autorizacao/store', 'store')->name('autorizacao.store');
                 Route::post('autorizacao/authorizar', 'authorizar')->name('autorizacao.authorizar');
-            });        
+            });       
+
+            // SPA Permissões (Autorizações) de Acesso na Entidade: Sistema (tabela acl_sistemas)
+            Route::controller(SistemaController::class)->group(function () {
+                Route::get('/sistema',          'index')->name('sistema.index');
+                Route::get('/sistema/{id?}',    'show')->name('sistema.show');
+                Route::post('sistema/store',    'store')->name('sistema.store');
+                Route::post('sistema/update',   'edit')->name('sistema.update');                
+                Route::post('sistema/destroy',  'destroy')->name('sistema.destroy');
+            });              
     
             // API bastaria este mas não funciona. 
             // Acesso a Entidade Organização (tabela acl_organizacaos) via API com token
@@ -131,15 +141,6 @@ Auth::routes();
             // API Acesso a Entidade Organização (tabela acl_organizacaos) via API com token
             // como as operacoes e as autorizacoes ocorrem na API da URL basta o index para a view blade
             Route::get('/organizacao', [OrganizacaoController::class, 'index'])->name('organizacao.index');
-
-            // SPA Permissões (Autorizações) de Acesso na Entidade: Organização (tabela acl_organizacaos) para SPA
-            // Route::controller(OrganizacaoController::class)->group(function () {
-                // Route::get('/organizacao', 'index')->name('organizacao.index');
-                // Route::get('/organizacao/{organizacao_id?}','show')->name('organizacao.show');
-                // Route::post('organizacao/edit', 'edit')->name('organizacao.edit');                
-                // Route::post('organizacao/destroy', 'destroy')->name('organizacao.destroy');
-                // Route::post('organizacao/store', 'store')->name('organizacao.store');
-            // });        
     
         });
 
