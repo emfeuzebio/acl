@@ -73,9 +73,9 @@
                         </div>                         
 
                         <div class="form-group">
-                            <label class="form-label">Círculo</label>
-                            <select name="organizacao_id" id="organizacao_id" class="form-control selectpicker" data-style="form-control" data-live-search="true" data-toggle="tooltip" data-placement="top" title="Selecione a Organizacao">
-                                <option value=""> Selecione a Organizacão </option>
+                            <label class="form-label">Organização</label>
+                            <select name="organizacao_id" id="organizacao_id" class="form-control selectpicker" data-style="form-control" data-live-search="true" data-toggle="tooltip" data-placement="top" title="Selecione a Organização">
+                                <option value=""> Selecione a Organização </option>
                                 @foreach( $organizacaos as $organizacao )
                                 <option value="{{$organizacao->id}}">{{$organizacao->sigla}}</option>
                                 @endforeach
@@ -220,7 +220,6 @@
                 $(".invalid-feedback").text('').hide();                             // hide all error displayed
                 $('#formEntity #ativo').prop('checked', true);                      // default SIM
                 $('#editarModal').modal('show');                                    // show modal 
-                // $('#btnPerfilSalvar').show();
             });              
 
             /*
@@ -244,11 +243,13 @@
                         $('#editarModal').modal('show');         //show the modal
 
                         // implementar que seja automático foreach   
-                        $('#id').val(data.id);
-                        $('#sigla').val(data.sigla);
-                        $('#nome').val(data.nome);
-                        $('#descricao').val(data.descricao);
+                        $('#formEntity #id').val(data.id);
+                        $('#formEntity #organizacao_id').selectpicker('val', data.organizacao_id);
+                        $('#formEntity #sigla').val(data.sigla);
+                        $('#formEntity #nome').val(data.nome);
+                        $('#formEntity #descricao').val(data.descricao);
                         $('#formEntity #ativo').prop('checked', (data.ativo == "SIM" ? true : false));
+                        // $('#formEntity #ativo').prop('checked', (response.data.ativo == "SIM" ? true : false));
                     },
                     error: function (error) {
                         $('#alertModal .modal-body').text(error.responseJSON.message)
@@ -326,14 +327,14 @@
                         $('#datatables').DataTable().ajax.reload(null, false);
                     },
                     error: function (error) {
-                        $('#alertModal .modal-body').text(error.responseJSON.message)
-                        $('#alertModal').modal('show');
+                        // $('#alertModal .modal-body').text(error.responseJSON.message)
+                        // $('#alertModal').modal('show');
 
                         // validator: vamos exibir todas as mensagens de erro do validador
                         // como o dataType não é JSON, precisa do responseJSON
-                        $("#formPermissao .invalid-feedback").text('').hide();
+                        $("#editarModal .invalid-feedback").text('').hide();
                         $.each( error.responseJSON.errors, function( key, value ) {
-                            $("#formPermissao #error-" + key ).text(value).show(); 
+                            $("#editarModal #error-" + key ).text(value).show(); 
                         });
                         // exibe mensagem sobre sucesso da operação
                         if(error.responseJSON.message.indexOf("1062") != -1) {

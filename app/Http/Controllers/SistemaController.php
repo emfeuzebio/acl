@@ -36,13 +36,13 @@ class SistemaController extends Controller
         $organizacaos = $this->Organizacao->all()->sortBy('nome');
 
         return view('acl/SistemaDatatable', ['organizacaos' => $organizacaos]);
-        // return view('admin/PgradsDatatable',['circulos'=> $circulos]);
     }
 
     public function show(Request $request)
     {        
-        $where = array('id'=>$request->id);
-        $sistema = Organizacao::where($where)->first();
+        // $where = array('id'=>$request->id);
+        // $sistema = Sistema::where($where)->first();
+        $sistema = Sistema::where('id',$request->id)->first();
         return Response()->json($sistema);
     }    
 
@@ -60,6 +60,7 @@ class SistemaController extends Controller
                 'id' => $request->id,
             ],
             [
+                'organizacao_id' => $request->organizacao_id,
                 'nome' => $request->nome,
                 'sigla' => $request->sigla,
                 'descricao' => $request->descricao,

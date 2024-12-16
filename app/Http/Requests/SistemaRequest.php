@@ -24,7 +24,7 @@ class SistemaRequest extends FormRequest
         return [
             'organizacao_id' => 'required',
             'nome' => 'required|min:6',
-            'sigla' => 'required|string|min:3|max:20|unique:acl_sistema,sigla,' . $this->id,   // atendo nas vírgulas
+            'sigla' => 'required|string|min:3|max:20|unique:acl_sistemas,sigla,' . $this->id,   // atendo nas vírgulas
             'descricao' => 'required|min:6',            
             'ativo' => ['required','in:"SIM","NÃO"'],
         ];
