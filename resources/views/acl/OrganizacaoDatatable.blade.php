@@ -44,7 +44,6 @@
                 </div>
 
                 <div class="card-body">
-                    <!-- compact | stripe | order-column | hover | cell-border | row-border | table-dark-->
                     <table id="datatables" class="table table-striped table-bordered table-hover table-sm compact" style="width:100%">
                         <thead></thead>
                         <tbody></tbody>
@@ -139,6 +138,22 @@
         </div>
     </div>   
 
+    <!-- modal para exibir Alertas necessários -->
+    <div class="modal fade" id="alertModal" tabindex="-1" aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">            
+            <div class="modal-content">
+                <div class="modal-header alert-warning">
+                    <h4 class="modal-title">Alerta</h4>
+                    <button type="button" class="close btnCancelar" data-bs-dismiss="modal" data-toggle="tooltip" title="Cancelar a operação (Esc ou Alt+C)" onClick="$('#alertModal').modal('hide');">&times;</button>
+                </div>
+                <div class="modal-body"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal" data-toggle="tooltip" title="Cancelar a operação (Esc ou Alt+C)" onClick="$('#alertModal').modal('hide');">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>    
+
     <!-- script de comportamento da página -->
     <script type="text/javascript">
 
@@ -193,8 +208,6 @@
                 $(".invalid-feedback").text('').hide();                             // hide all error displayed
                 $('#formEntity #ativo').prop('checked', true);                      // default SIM
                 $('#editarModal').modal('show');                                    // show modal 
-                $('#btnPerfilSalvar').show();
-                // $('#editarModal #model').focus();
             });              
 
             /*
@@ -206,8 +219,8 @@
                 const id = $(this).parents('tr').attr("id");
 
                 $.ajax({
-                    type: "POST",
-                    url: "organizacao/edit",
+                    type: "GET",
+                    url: "organizacao/show",
                     data: { "id": id },
                     dataType: 'json',
                     success: function (data) {
@@ -218,19 +231,17 @@
                         $('#editarModal').modal('show');         //show the modal
 
                         // implementar que seja automático foreach   
-                        $('#id').val(data.id);
-                        $('#sigla').val(data.sigla);
-                        $('#nome').val(data.nome);
-                        $('#descricao').val(data.descricao);
+                        $('#formEntity #id').val(data.id);
+                        $('#formEntity #sigla').val(data.sigla);
+                        $('#formEntity #nome').val(data.nome);
+                        $('#formEntity #descricao').val(data.descricao);
                         $('#formEntity #ativo').prop('checked', (data.ativo == "SIM" ? true : false));
                     },
                     error: function (error) {
-                        if (error.responseJSON === 401 || error.responseJSON.message && error.statusText === 'Unauthenticated') {
-                            window.location.href = "{{ url('/') }}";
-                        }
+                        $('#alertModal .modal-body').text(error.responseJSON.message)
+                        $('#alertModal').modal('show');
                     }
                 }); 
-
             });           
 
             /*
@@ -306,10 +317,16 @@
                         }
                         // validator: vamos exibir todas as mensagens de erro do validador
                         // como o dataType não é JSON, precisa do responseJSON
+                        $("#editarModal .invalid-feedback").text('').hide();
                         $.each( error.responseJSON.errors, function( key, value ) {
-                            $("#error-" + key ).text(value).show(); //show all error messages
+                            $("#editarModal #error-" + key ).text(value).show(); 
                         });
-                        $('#msgOperacao').text(error.responseJSON.message).show();
+                        // exibe mensagem sobre sucesso da operação
+                        if(error.responseJSON.message.indexOf("1062") != -1) {
+                            $('#msgOperacao').text("Impossível SALVAR! Registro já existe. (SQL-1062)").show();
+                        } else if(error.responseJSON.exception) {
+                            $('#msgOperacao').text(error.responseJSON.message).show();
+                        }
                     }
                 });                
             });

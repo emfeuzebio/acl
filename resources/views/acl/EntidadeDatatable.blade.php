@@ -305,9 +305,9 @@
                     {"data": "id", "botoes": "", "orderable": false, "class": "dt-center", "title": "Ações", "width": "80px", 
                         render: function (data, type, row) { 
                             // As Estidades Básica (id=[1-5]) não podem ser excluídas
-                            return ( row.id > 5 ? '<button class="btnEntidadeEditar btn btn-primary btn-xs" data-toggle="tooltip" title="Editar o registro atual">Editar</button> ' : 
+                            return ( row.id > 9 ? '<button class="btnEntidadeEditar btn btn-primary btn-xs" data-toggle="tooltip" title="Editar o registro atual">Editar</button> ' : 
                                                   '<button class="btnEntidadeEditar btn btn-primary btn-xs" data-toggle="tooltip" title="Ver o registro atual">Ver</button>' )  + 
-                                   ( row.id > 5 ? '<button class="btnEntidadeExcluir btn btn-danger btn-xs" data-toggle="tooltip" title="Excluir o registro atual">Excluir</button> ' : ' ' ) +
+                                   ( row.id > 9 ? '<button class="btnEntidadeExcluir btn btn-danger btn-xs" data-toggle="tooltip" title="Excluir o registro atual">Excluir</button> ' : ' ' ) +
                                    '<button class="btnRotas btn btn-info btn-xs" data-toggle="tooltip" title="Editar as Rotas da Entidade atual">Rotas</button> '; 
                         }
                     },

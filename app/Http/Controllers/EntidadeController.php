@@ -33,26 +33,24 @@ class EntidadeController extends Controller
 
     public function rotas(Request $request)
     {        
-        $Rotas = Rota::where('entidade_id',$request->id)->get();
+        $rotas = Rota::where('entidade_id',$request->id)->get();
         // echo '<pre>';
         // print_r($Rotas->rota) . PHP_EOL;
         // echo '</pre>';
-        return Response()->json($Rotas);
+        return Response()->json($rotas);
     }   
 
     public function edit(Request $request)
     {        
-        $Entidade = Entidade::where('id',$request->id)->first();
-        return Response()->json($Entidade);
+        $entidade = Entidade::where('id',$request->id)->first();
+        return Response()->json($entidade);
     }       
 
     public function store(EntidadeRequest $request)
     {
-        // dd($request->all());
-
-        // As Estidades Básica (id=[1-5]) não podem ser nem Editadas nem Excluídas
+        // As Estidades Básica (id=[1-9]) não podem ser nem Editadas nem Excluídas
         $id = (int) $request->id;
-        if($id >= 1 && $id <= 5) {
+        if($id >= 1 && $id <= 9) {
             return Response()->json(['message'=>'Exception: NÃO é permitido editar uma Entidade Básica. ID (' . $request->id . ')'], HttpResponse::HTTP_UNPROCESSABLE_ENTITY); //422
         }
 
@@ -90,14 +88,13 @@ class EntidadeController extends Controller
                 }                                     
             }
             catch(Exception $e) {
-                throw new \Exception('EUZ-ROTA-Exception:' . $e);
-                // return $e;
+                throw new Exception('EUZ-ROTA-Exception:' . $e);
             }
-            return $Entidade;
 
+            return $Entidade;
         });
 
-        return Response()->json(is_null($exception) ? 'Tudo Certo' : $exception);
+        return Response()->json(is_null($exception) ? ['id' => $request->id] : $exception);
     }        
 
 

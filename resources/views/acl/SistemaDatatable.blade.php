@@ -74,7 +74,8 @@
 
                         <div class="form-group">
                             <label class="form-label">Organização</label>
-                            <select name="organizacao_id" id="organizacao_id" class="form-control selectpicker" data-style="form-control" data-live-search="true" data-toggle="tooltip" data-placement="top" title="Selecione a Organização">
+                            <!-- <select name="organizacao_id" id="organizacao_id" class="form-control selectpicker" data-style="form-control" data-live-search="true" data-toggle="tooltip" data-placement="top" title="Selecione a Organização"> -->
+                            <select name="organizacao_id" id="organizacao_id" class="form-control" data-toggle="tooltip" data-placement="top" title="Selecione a Organização">
                                 <option value=""> Selecione a Organização </option>
                                 @foreach( $organizacaos as $organizacao )
                                 <option value="{{$organizacao->id}}">{{$organizacao->sigla}}</option>
@@ -244,19 +245,18 @@
 
                         // implementar que seja automático foreach   
                         $('#formEntity #id').val(data.id);
-                        $('#formEntity #organizacao_id').selectpicker('val', data.organizacao_id);
+                        // $('#formEntity #organizacao_id').selectpicker('val', data.organizacao_id);
+                        $('#formEntity #organizacao_id').val(data.organizacao_id);
                         $('#formEntity #sigla').val(data.sigla);
                         $('#formEntity #nome').val(data.nome);
                         $('#formEntity #descricao').val(data.descricao);
                         $('#formEntity #ativo').prop('checked', (data.ativo == "SIM" ? true : false));
-                        // $('#formEntity #ativo').prop('checked', (response.data.ativo == "SIM" ? true : false));
                     },
                     error: function (error) {
                         $('#alertModal .modal-body').text(error.responseJSON.message)
                         $('#alertModal').modal('show');
                     }
                 }); 
-
             });           
 
             /*
@@ -327,9 +327,9 @@
                         $('#datatables').DataTable().ajax.reload(null, false);
                     },
                     error: function (error) {
-                        // $('#alertModal .modal-body').text(error.responseJSON.message)
-                        // $('#alertModal').modal('show');
-
+                        if (error.responseJSON === 401 || error.responseJSON.message && error.statusText === 'Unauthenticated') {
+                            window.location.href = "{{ url('/') }}";
+                        }
                         // validator: vamos exibir todas as mensagens de erro do validador
                         // como o dataType não é JSON, precisa do responseJSON
                         $("#editarModal .invalid-feedback").text('').hide();

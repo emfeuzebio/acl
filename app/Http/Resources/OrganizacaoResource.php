@@ -28,7 +28,6 @@ class OrganizacaoResource extends JsonResource
             "criado_em" => $this->created_at ? $this->created_at->format('d/m/Y H:i:s') : null,
             "atualizado_em" => $this->updated_at ? $this->updated_at->format('d/m/Y H:i:s') : null,
             // "atualizado_em" => $this->updated_at ? Carbon::parse($this->updated_at)->format('d/m/Y H:i:s') : null,
-            // "viagens" => $this->viagens,
         ];
     }
 }

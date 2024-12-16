@@ -132,6 +132,15 @@ Auth::routes();
                 Route::post('sistema/destroy',  'destroy')->name('sistema.destroy');
             });              
     
+            // SPA Permissões (Autorizações) de Acesso na Entidade: Organização (tabela acl_organizacaos)
+            Route::controller(OrganizacaoController::class)->group(function () {
+                Route::get('/organizacao',          'index')->name('organizacao.index');
+                Route::get('/organizacao/{id?}',    'show')->name('organizacao.show');
+                Route::post('organizacao/store',    'store')->name('organizacao.store');
+                Route::post('organizacao/update',   'edit')->name('organizacao.update');                
+                Route::post('organizacao/destroy',  'destroy')->name('organizacao.destroy');
+            });              
+    
             // API bastaria este mas não funciona. 
             // Acesso a Entidade Organização (tabela acl_organizacaos) via API com token
             // Route::get('/organizacao', function () {

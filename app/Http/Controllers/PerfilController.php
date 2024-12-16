@@ -145,8 +145,8 @@ class PerfilController extends Controller
 
     public function show(Request $request)
     {        
-        $Perfil = Perfil::where('id',$request->id)->first();
-        return Response()->json($Perfil);
+        $perfil = Perfil::where('id',$request->id)->first();
+        return Response()->json($perfil);
     }       
 
     public function store(PerfilRequest $request)
@@ -165,19 +165,21 @@ class PerfilController extends Controller
                         'ativo' => $request->ativo,
                     ]
                 );  
+
+                // PASSO 2 - vamos inserir todas as respectivas Autorizações das Entidades Básicas no novo Perfil de Acesso 
+                // vamos buscar todas as Autorizações das Entidades Básicas do Perfil 1-Administrador necessárias das Entidades Padrão (ID de 1 a 9) para passar ao novo Perfil
+                $sql = "
+                    SELECT *
+                    FROM acl_autorizacaos
+                    WHERE perfil_id = 1
+                    AND entidade_id BETWEEN 1 AND 9
+                ";
+                $autorizacaosBasicas = DB::select($sql);
+
     
                 // Se for INSERT de um Novo Perfil de Acesso
                 // PASSO 2 - vamos inserir todas as respectivas Autorizações das Entidades Básicas no novo Perfil de Acesso 
                 if ($Perfil->wasRecentlyCreated) {
-
-                    // vamos buscar todas as Autorizações das Entidades Básicas do Perfil 1-Administrador necessárias das Entidades Padrão (ID de 1 a 5) para passar ao novo Perfil
-                    $sql = "
-                        SELECT *
-                        FROM acl_autorizacaos
-                        WHERE perfil_id = 1
-                        AND entidade_id BETWEEN 1 AND 5;                    
-                    ";
-                    $autorizacaosBasicas = DB::select($sql);
 
                     // criar as Autorizações de Cada Rota (Ação) Básica e concede ao novo Perfil de Acesso
                     foreach($autorizacaosBasicas as $key => $autorizacao) {
@@ -191,16 +193,31 @@ class PerfilController extends Controller
 
                     // PASSO 3 - Vamos conceder acesso ao Super Usuário ID=1 no novo Perfil de Acesso
                     DB::select('INSERT INTO acl_perfil_user SET user_id = 1, perfil_id = ? ', [$Perfil->id]);
+                } else {
 
-                }                                     
+                    /**
+                     * Mesmo sendo um UPDATE do Perfil
+                     * Vamos tentar criar as Autorizações de Cada Rota (Ação) Básica
+                     */
+                    // criar as Autorizações de Cada Rota (Ação) Básica e concede ao novo Perfil de Acesso
+                    foreach($autorizacaosBasicas as $key => $autorizacao) {
+
+                        Autorizacao::insertOrIgnore([
+                            'perfil_id' => $Perfil->id,
+                            'entidade_id' => $autorizacao->entidade_id,
+                            'rota_id' => $autorizacao->rota_id,
+                            'ativo' => 'SIM',
+                        ]);  
+                    }
+                    
+                }                           
             }
             catch(Exception $e) {
-                throw new \Exception('EUZ-PERFIL-Exception:' . $e);
-                // return $e;
+                throw new Exception('EUZ-PERFIL-Exception:' . $e);
             }
         });
 
-        return Response()->json(is_null($exception) ? 'Tudo Certo' : $exception);
+        return Response()->json(is_null($exception) ? ['id' => $request->id] : $exception);
     }
 
 

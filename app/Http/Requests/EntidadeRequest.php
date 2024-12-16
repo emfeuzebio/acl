@@ -22,8 +22,8 @@ class EntidadeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'tabela' => 'required|min:4',
-            'model' => 'required|min:4',                    //|unique
+            'tabela' => 'required|string|min:6|unique:acl_entidades,tabela,' . $this->id,   // atendo nas vírgulas
+            'model' => 'required|string|min:3|max:12|unique:acl_entidades,model,' . $this->id,   // atendo nas vírgulas
             'descricao' => 'required|min:4',            
             'ativo' => ['required','in:"SIM","NÃO"'],
         ];

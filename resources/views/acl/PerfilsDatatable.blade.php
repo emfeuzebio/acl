@@ -304,7 +304,7 @@
                     {"data": "entidades", "entidades": "", "orderable": false, "class": "dt-left", "title": "Entidades em que tês Autorizações", "width": "auto",
                         render: function(data, type, row) {
                             return '<button class="btn btn-xs btn-success btnNovoEntidade" data-toggle="tooltip" title="Administrar Entidades concedidas a este Perfil">Administrar</button> ' + $.map(data, function(d, i) {
-                                return '<button id="' + d.id + '" class="btn btn-xs btn-' + ( d.id <= 5 ? 'default' : 'info btnEntidadeEditar' ) + '" data-toggle="tooltip" title="' + ( d.id <= 5 ? 'Entidade Padrão não pode ser editada.' : 'Administrar as Permissões concedidas à Entidade' ) + ' (' + d.model + ')">' + d.model + '</button> ';
+                                return '<button id="' + d.id + '" class="btn btn-xs btn-' + ( d.id <= 9 ? 'default' : 'info btnEntidadeEditar' ) + '" data-toggle="tooltip" title="' + ( d.id <= 5 ? 'Entidade Padrão não pode ser editada.' : 'Administrar as Permissões concedidas à Entidade' ) + ' (' + d.model + ')">' + d.model + '</button> ';
                             }).join(' ');
                     }},
                     {"data": "ativo", "name": "acl_perfils.ativo", "class": "dt-center", "title": "Ativo",  
@@ -504,7 +504,7 @@
                             '<tr id="tr' + obj.id + '">' + 
                                 '<td>' + (i+1) + '</td>' + 
                                 '<td>' + obj.model + '</td>' + 
-                                '<td class="text-center">' + ( obj.id > 5 ?  
+                                '<td class="text-center">' + ( obj.id > 9 ?  
                                     '<label class="switch">' + 
                                     '<input type="checkbox" id="' + obj.id + '" ' + obj.concedido + ' data-perfil_id="' + id + '" data-entidade_id="' + obj.id + '" class="switch-input" data-toggle="tooltip" title="Incluir">' + 
                                     '<span class="switch-label" data-on="SIM" data-off="NÃO"></span>' + 

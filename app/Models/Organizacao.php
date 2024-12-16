@@ -21,8 +21,8 @@ class Organizacao extends Model
 
     // relacionamento One to Many - nome do relacionamneto: caixa baixa no plural
     // Organizacao é PAI de várias Entidades [Sistema,] . "um para muitos": "Uma Organização pode ter muitos(as) ..."
-    // public function sistemas()
-    // {
-    //     return $this->hasMany(Viagem::class);
-    // }        
+    public function sistemas()
+    {
+        return $this->hasMany(Sistema::class);
+    }        
 }

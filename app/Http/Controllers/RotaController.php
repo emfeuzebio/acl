@@ -55,17 +55,14 @@ class RotaController extends Controller
                         ]);  
                     }
                 }
-
             }
             catch(Exception $e) {
-                throw new \Exception('EUZ-ENTIDADE-Exception:' . $e);
-                // return $e;
+                throw new Exception('EUZ-ENTIDADE-Exception:' . $e);
             }
             return $Rota;
-
         });                
 
-        return Response()->json(is_null($exception) ? 'Tudo Certo' : $exception);
+        return Response()->json(is_null($exception) ? ['id' => $request->id] : $exception);
     }  
 
     public function destroy(Request $request)
