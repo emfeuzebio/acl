@@ -71,7 +71,18 @@
                             <label class="form-label">ID</label>
                             <input class="form-control" value="" type="text" id="id" name="id" placeholder="" readonly>
                         </div>                         
-                        
+
+                        <div class="form-group">
+                            <label class="form-label">Círculo</label>
+                            <select name="organizacao_id" id="organizacao_id" class="form-control selectpicker" data-style="form-control" data-live-search="true" data-toggle="tooltip" data-placement="top" title="Selecione a Organizacao">
+                                <option value=""> Selecione a Organizacão </option>
+                                @foreach( $organizacaos as $organizacao )
+                                <option value="{{$organizacao->id}}">{{$organizacao->sigla}}</option>
+                                @endforeach
+                            </select>
+                            <div id="error-organizacao_id" class="error invalid-feedback" style="display: none;"></div>
+                        </div> 
+
                         <div class="form-group">
                             <label class="form-label">Nome</label>
                             <input class="form-control" value="" type="text" id="nome" name="nome" placeholder="Sistema de Gestão de Viagens" data-toggle="tooltip" title="Digite o Nome do Sistema" >

@@ -10,9 +10,11 @@ use Yajra\DataTables\Facades\DataTables;
 
 class SistemaController extends Controller
 {
-    
+    protected $Organizacao = null;
+
     public function __construct() {
 
+        $this->Organizacao = new Organizacao();
     }
 
     public function index() {
@@ -31,9 +33,10 @@ class SistemaController extends Controller
         }
 
         // aqui precisamos pegar a lista de Organizacoes e enviar para o view fazer o combobox
-        $organizacaos = [];
+        $organizacaos = $this->Organizacao->all()->sortBy('nome');
 
-        return view('acl/SistemaDatatable', ['$organizacaos' => $organizacaos]);
+        return view('acl/SistemaDatatable', ['organizacaos' => $organizacaos]);
+        // return view('admin/PgradsDatatable',['circulos'=> $circulos]);
     }
 
     public function show(Request $request)
