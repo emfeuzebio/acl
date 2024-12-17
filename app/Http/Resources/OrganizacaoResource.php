@@ -12,7 +12,7 @@ class OrganizacaoResource extends JsonResource
      * Transform the resource into an array.
      *
      * @return array<string, mixed>
-     */
+     */ 
     public function toArray(Request $request): array
     {
         // return parent::toArray($request);
@@ -28,6 +28,8 @@ class OrganizacaoResource extends JsonResource
             "criado_em" => $this->created_at ? $this->created_at->format('d/m/Y H:i:s') : null,
             "atualizado_em" => $this->updated_at ? $this->updated_at->format('d/m/Y H:i:s') : null,
             // "atualizado_em" => $this->updated_at ? Carbon::parse($this->updated_at)->format('d/m/Y H:i:s') : null,
+            'sistemas' => $this->sistemas,
+            // 'sistemas' => SistemaResource::collection($this->whenLoaded('sistemas')), // Aplica um recurso para a relação 'sistemas'
         ];
     }
 }
