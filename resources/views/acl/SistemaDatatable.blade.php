@@ -170,6 +170,8 @@
     <!-- script de comportamento da página -->
     <script type="text/javascript">
 
+        const ERROR_HTTP_STATUS = new Set([401, 419]); // 401-UNAUTHORIZED, 403-FORBIDDEN, 419-PAGE_EXPIRED, 404-NOT_FOUND, 500-INTERNAL_SERVER_ERROR
+
         $(document).ready(function () {
 
             var id = '';
@@ -177,7 +179,7 @@
             // valida o X-CSRF-TOKEN
             $.ajaxSetup({
                 headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-                statusCode: { 401: function() { window.location.href = "/";} }
+                statusCode: { 401: function() { window.location.href = "/login";} }
             });
 
             /*
@@ -253,6 +255,11 @@
                         $('#formEntity #ativo').prop('checked', (data.ativo == "SIM" ? true : false));
                     },
                     error: function (error) {
+                        if (ERROR_HTTP_STATUS.has(error.status)) {
+                            window.location.href = "{{ url('/login') }}";
+                            return;
+                        } 
+
                         $('#alertModal .modal-body').text(error.responseJSON.message)
                         $('#alertModal').modal('show');
                     }
@@ -288,6 +295,11 @@
                             $('#datatables').DataTable().ajax.reload(null, false);  
                         },
                         error: function (error) {
+                            if (ERROR_HTTP_STATUS.has(error.status)) {
+                                window.location.href = "{{ url('/login') }}";
+                                return;
+                            } 
+
                             $('#msgOperacaoExcluir').text(error.responseJSON.message).show();
                             if(error.responseJSON.message.indexOf("1451") != -1) {
                                 $('#msgOperacaoExcluir').text('Impossível EXCLUIR porque há registros relacionados. (SQL-1451)').show();
@@ -327,9 +339,11 @@
                         $('#datatables').DataTable().ajax.reload(null, false);
                     },
                     error: function (error) {
-                        if (error.responseJSON === 401 || error.responseJSON.message && error.statusText === 'Unauthenticated') {
-                            window.location.href = "{{ url('/') }}";
-                        }
+                        if (ERROR_HTTP_STATUS.has(error.status)) {
+                            window.location.href = "{{ url('/login') }}";
+                            return;
+                        } 
+
                         // validator: vamos exibir todas as mensagens de erro do validador
                         // como o dataType não é JSON, precisa do responseJSON
                         $("#editarModal .invalid-feedback").text('').hide();
