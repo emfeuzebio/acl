@@ -265,6 +265,7 @@
 
     <script type="text/javascript">
 
+        const ERROR_HTTP_STATUS = new Set([401, 419]); // 401-UNAUTHORIZED, 403-FORBIDDEN, 419-PAGE_EXPIRED, 404-NOT_FOUND, 500-INTERNAL_SERVER_ERROR
         let trId = 0;
 
         $(document).ready(function () {
@@ -274,7 +275,7 @@
 
             $.ajaxSetup({
                 headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-                statusCode: { 401: function() { window.location.href = "/"; } }
+                statusCode: { 401: function() { window.location.href = "/login"; } }
             });
 
             // Admin pode tudo
@@ -386,12 +387,13 @@
                         $('#tblPermissoesLinhas').empty().append(tblPermissoesLinhas);  //adiciona as linhas na tabela
                     },
                     error: function (error) {
+                        if (ERROR_HTTP_STATUS.has(error.status)) {
+                            window.location.href = "{{ url('/login') }}";
+                            return;
+                        } 
+
                         $('#alertModal .modal-body').text(error.responseJSON.message)
                         $('#alertModal').modal('show');
-                        // if (error.responseJSON.message) {
-                        //     $("#alert .alert-content").text('ERRO: ' + error.responseJSON.message + 'A operação foi cancelada.');
-                        //     $('#alert').removeClass().addClass('alert alert-danger').show().delay(4000).fadeOut(1000);
-                        // }
                     }
                 });                 
             });             
@@ -421,6 +423,11 @@
                         $('#tblPermissoesLinhas').append(tblPermissoesLinhas);  //adiciona as linhas na tabela
                     },
                     error: function (error) {
+                        if (ERROR_HTTP_STATUS.has(error.status)) {
+                            window.location.href = "{{ url('/login') }}";
+                            return;
+                        } 
+
                         $('#alertModal .modal-body').text(error.responseJSON.message)
                         $('#alertModal').modal('show');
 
@@ -466,6 +473,11 @@
                         // $('#ativo').bootstrapToggle(data.ativo == "SIM" ? 'on' : 'off');
                     },
                     error: function (error) {
+                        if (ERROR_HTTP_STATUS.has(error.status)) {
+                            window.location.href = "{{ url('/login') }}";
+                            return;
+                        } 
+
                         $('#alertModal .modal-body').text(error.responseJSON.message)
                         $('#alertModal').modal('show');
 
@@ -525,6 +537,11 @@
                         
                     },
                     error: function (error) {
+                        if (ERROR_HTTP_STATUS.has(error.status)) {
+                            window.location.href = "{{ url('/login') }}";
+                            return;
+                        } 
+
                         $('#alertModal .modal-body').text(error.responseJSON.message)
                         $('#alertModal').modal('show');
                     }
@@ -559,12 +576,16 @@
                         $('#btnRefresh').trigger('click');
                     },
                     error: function (error) {
+                        if (ERROR_HTTP_STATUS.has(error.status)) {
+                            window.location.href = "{{ url('/login') }}";
+                            return;
+                        } 
+
                         $('#'+chkObjeto).prop('checked', (chkCheked == 'SIM' ? false : true));
                         $('#alertModal .modal-body').text(error.responseJSON.message)
                         $('#alertModal').modal('show');                        
                     }
                 });                 
-               
             });       
             
             
@@ -589,6 +610,11 @@
                         //alert(data.ativo);
                     },
                     error: function (error) {
+                        if (ERROR_HTTP_STATUS.has(error.status)) {
+                            window.location.href = "{{ url('/login') }}";
+                            return;
+                        } 
+
                         // alert(chkCheked); - retorna o checkbox para o estado anterior
                         $('#'+chkObjeto).prop('checked', (chkCheked == 'SIM' ? false : true));
                         $('#alertModal .modal-body').text(error.responseJSON.message)
@@ -628,6 +654,11 @@
                             $('#datatables-perfils').DataTable().ajax.reload(null, false);
                         },
                         error: function (error) {
+                            if (ERROR_HTTP_STATUS.has(error.status)) {
+                                window.location.href = "{{ url('/login') }}";
+                                return;
+                            } 
+
                             $('#msgOperacaoExcluir').text(error.responseJSON.message).show();
                             if(error.responseJSON.message.indexOf("1451") != -1) {
                                 $('#msgOperacaoExcluir').text('Impossível EXCLUIR porque há registros relacionados. (SQL-1451)').show();
@@ -674,6 +705,11 @@
                         }
                     },
                     error: function (error) {
+                        if (ERROR_HTTP_STATUS.has(error.status)) {
+                            window.location.href = "{{ url('/login') }}";
+                            return;
+                        } 
+
                         $('#alertModal .modal-body').text(error.responseJSON.message)
                         $('#alertModal').modal('show');
                     }
@@ -707,9 +743,10 @@
                         // $('#ativo').bootstrapToggle(data.ativo == "SIM" ? 'on' : 'off');
                     },
                     error: function (error) {
-                        if (error.responseJSON === 401 || error.responseJSON.message && error.statusText === 'Unauthenticated') {
-                            window.location.href = "{{ url('/') }}";
-                        }
+                        if (ERROR_HTTP_STATUS.has(error.status)) {
+                            window.location.href = "{{ url('/login') }}";
+                            return;
+                        } 
                     }
                 }); 
 
@@ -739,9 +776,11 @@
                         $('#datatables-perfils').DataTable().ajax.reload(null, false);
                     },
                     error: function (error) {
-                        if (error.responseJSON === 401 || error.responseJSON.message && error.statusText === 'Unauthenticated') {
-                            window.location.href = "{{ url('/') }}";
-                        }
+                        if (ERROR_HTTP_STATUS.has(error.status)) {
+                            window.location.href = "{{ url('/login') }}";
+                            return;
+                        } 
+
                         // validator: vamos exibir todas as mensagens de erro do validador, como o dataType não é JSON, precisa do responseJSON
                         $.each( error.responseJSON.errors, function( key, value ) {
                             $("#error-" + key ).text(value).show(); 
@@ -782,9 +821,11 @@
                         $('#datatables-perfils').DataTable().ajax.reload(null, false);
                     },
                     error: function (error) {
-                        if (error.responseJSON === 401 || error.responseJSON.message && error.statusText === 'Unauthenticated') {
-                            window.location.href = "{{ url('/') }}";
-                        }
+                        if (ERROR_HTTP_STATUS.has(error.status)) {
+                            window.location.href = "{{ url('/login') }}";
+                            return;
+                        } 
+
                         // validator: vamos exibir todas as mensagens de erro do validador
                         // como o dataType não é JSON, precisa do responseJSON
                         $.each( error.responseJSON.errors, function( key, value ) {
@@ -812,41 +853,7 @@
                 });                
 
                 alert('btnEntidadesMarcadasSalvar');
-
-                // Ajax enviar para gravar
-                
-
-
-                // $.ajax({
-                //     type: "POST",
-                //     url: "{{url("entidade/store")}}",
-                //     data: formData,
-                //     cache: false,
-                //     contentType: false,
-                //     processData: false,
-                //     success: function (data) {
-                //         $("#alert .alert-content").text('Salvou registro ID ' + data.id + ' com sucesso.');
-                //         $('#alert').removeClass().addClass('alert alert-success').show().delay(5000).fadeOut(1000);
-                //         $('#modalPerfilEditar').modal('hide');
-                //         $('#datatables-perfils').DataTable().ajax.reload(null, false);
-                //     },
-                //     error: function (error) {
-                //         if (error.responseJSON === 401 || error.responseJSON.message && error.statusText === 'Unauthenticated') {
-                //             window.location.href = "{{ url('/') }}";
-                //         }
-                //         // validator: vamos exibir todas as mensagens de erro do validador
-                //         // como o dataType não é JSON, precisa do responseJSON
-                //         $.each( error.responseJSON.errors, function( key, value ) {
-                //             $("#error-" + key ).text(value).show(); 
-                //         });
-                //         // exibe mensagem sobre sucesso da operação
-                //         if(error.responseJSON.message.indexOf("1062") != -1) {
-                //             $('#msgOperacaoEditar').text("Impossível SALVAR! Registro já existe. (SQL-1062)").show();
-                //         } else if(error.responseJSON.exception) {
-                //             $('#msgOperacaoEditar').text(error.responseJSON.message).show();
-                //         }
-                //     }
-                // });                
+           
             });
 
             /*

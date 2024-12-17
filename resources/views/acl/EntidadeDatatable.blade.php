@@ -236,6 +236,7 @@
 
     <script type="text/javascript">
 
+        const ERROR_HTTP_STATUS = new Set([401, 419]); // 401-UNAUTHORIZED, 403-FORBIDDEN, 419-PAGE_EXPIRED, 404-NOT_FOUND, 500-INTERNAL_SERVER_ERROR
         let trId = 0;
 
         function ExcluirRota(id) {
@@ -262,6 +263,11 @@
                             $('#tblRotas #tr' + trId).remove();
                         },
                         error: function (error) {
+                            if (ERROR_HTTP_STATUS.has(error.status)) {
+                                window.location.href = "{{ url('/login') }}";
+                                return;
+                            } 
+
                             // $('#msgOperacaoExcluir').text(error.responseJSON.message).show();
                             $('#alertModal .modal-body').text(error.responseJSON.message)
                             $('#alertModal').modal('show');
@@ -347,12 +353,12 @@
                         }
                     },
                     error: function (error) {
+                        if (ERROR_HTTP_STATUS.has(error.status)) {
+                            window.location.href = "{{ url('/login') }}";
+                            return;
+                        } 
                         $('#alertModal .modal-body').text(error.responseJSON.message)
                         $('#alertModal').modal('show');
-                        // if (error.responseJSON.message) {
-                        //     $("#alert .alert-content").text('ERRO: ' + error.responseJSON.message + 'A operação foi cancelada.');
-                        //     $('#alert').removeClass().addClass('alert alert-danger').show().delay(4000).fadeOut(1000);
-                        // }
                     }
                 });                 
             });             
@@ -386,6 +392,11 @@
                             $('#datatables-entidades').DataTable().ajax.reload(null, false);
                         },
                         error: function (error) {
+                            if (ERROR_HTTP_STATUS.has(error.status)) {
+                                window.location.href = "{{ url('/login') }}";
+                                return;
+                            } 
+
                             if(error.responseJSON.message.indexOf("1451") != -1) {
                                 $('#msgOperacaoExcluir').text('Impossível EXCLUIR porque há registros relacionados. (SQL-1451)').show();
                             } else {
@@ -422,9 +433,10 @@
                         $('#datatables-entidades').DataTable().ajax.reload(null, false);
                     },
                     error: function (error) {
-                        if (error.responseJSON === 401 || error.responseJSON.message && error.statusText === 'Unauthenticated') {
-                            window.location.href = "{{ url('/') }}";
-                        }
+                        if (ERROR_HTTP_STATUS.has(error.status)) {
+                            window.location.href = "{{ url('/login') }}";
+                            return;
+                        } 
                         // validator: vamos exibir todas as mensagens de erro do validador, como o dataType não é JSON, precisa do responseJSON
                         $.each( error.responseJSON.errors, function( key, value ) {
                             $("#error-" + key ).text(value).show(); 
@@ -446,7 +458,6 @@
             */
             $('#btnEntidadeNovo').on("click", function (e) {
                 e.stopImmediatePropagation();
-
                 // $.ajax({
                 //     url: '/isAuthenticated',
                 //     method: 'GET',
@@ -498,6 +509,11 @@
                         $('#tblRotasBody').empty().append(tblRotas);  //adiciona as linhas na tabela      
                     },
                     error: function (error) {
+                        if (ERROR_HTTP_STATUS.has(error.status)) {
+                            window.location.href = "{{ url('/login') }}";
+                            return;
+                        } 
+
                         $('#alertModal .modal-body').text(error.responseJSON.message)
                         $('#alertModal').modal('show');
 
@@ -551,6 +567,11 @@
 
                     },
                     error: function (error) {
+                        if (ERROR_HTTP_STATUS.has(error.status)) {
+                            window.location.href = "{{ url('/login') }}";
+                            return;
+                        } 
+
                         $('#alertModal .modal-body').text(error.responseJSON.message)
                         $('#alertModal').modal('show');
                     }
