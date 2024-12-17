@@ -387,7 +387,7 @@
                         $('#tblPermissoesLinhas').empty().append(tblPermissoesLinhas);  //adiciona as linhas na tabela
                     },
                     error: function (error) {
-                        if (ERROR_HTTP_STATUS.has(error.status)) {
+                        if (ERROR_HTTP_STATUS.has(error.status)) { 
                             window.location.href = "{{ url('/login') }}";
                             return;
                         } 

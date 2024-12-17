@@ -254,7 +254,7 @@
                         $('#formEntity #descricao').val(data.descricao);
                         $('#formEntity #ativo').prop('checked', (data.ativo == "SIM" ? true : false));
                     },
-                    error: function (error) {
+                    error: function (error) { 
                         if (ERROR_HTTP_STATUS.has(error.status)) {
                             window.location.href = "{{ url('/login') }}";
                             return;
