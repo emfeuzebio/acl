@@ -1,6 +1,7 @@
 @extends('adminlte::page')
 
 @section('content_header')
+
     <div class="row mb-2">
         <div class="m-0 text-dark col-sm-6">
         <h1 class="m-0 text-dark"></h1>
@@ -270,6 +271,7 @@
 
         $(document).ready(function () {
 
+            let entidadePadrao = 0;
             let id = '';
             let btnAcoes = '';
 
@@ -305,7 +307,7 @@
                     {"data": "entidades", "entidades": "", "orderable": false, "class": "dt-left", "title": "Entidades em que tês Autorizações", "width": "auto",
                         render: function(data, type, row) {
                             return '<button class="btn btn-xs btn-success btnNovoEntidade" data-toggle="tooltip" title="Administrar Entidades concedidas a este Perfil">Administrar</button> ' + $.map(data, function(d, i) {
-                                return '<button id="' + d.id + '" class="btn btn-xs btn-' + ( d.id <= 9 ? 'default' : 'info btnEntidadeEditar' ) + '" data-toggle="tooltip" title="' + ( d.id <= 5 ? 'Entidade Padrão não pode ser editada.' : 'Administrar as Permissões concedidas à Entidade' ) + ' (' + d.model + ')">' + d.model + '</button> ';
+                                return '<button id="' + d.id + '" class="btn btn-xs btn-' + ( d.id <= entidadePadrao ? 'default' : 'info btnEntidadeEditar' ) + '" data-toggle="tooltip" title="' + ( d.id <= entidadePadrao ? 'Entidade Padrão não pode ser editada.' : 'Administrar as Permissões concedidas à Entidade' ) + ' (' + d.model + ')">' + d.model + '</button> ';
                             }).join(' ');
                     }},
                     {"data": "ativo", "name": "acl_perfils.ativo", "class": "dt-center", "title": "Ativo",  
@@ -363,8 +365,8 @@
                         $('#formPerfilEditar #tabela').val(data.tabela);
                         $('#formPerfilEditar #descricao').val(data.descricao);
                         $('#formPerfilEditar #ativo').val(data.ativo);
-                        //$('#formPerfilEditar #ativo').bootstrapToggle(data.ativo == "SIM" ? 'on' : 'off');
 
+                        // monta tabela de autorizações
                         tblPermissoesLinhas = '';
                         $.each(data.autorizacoes, function(i, obj){
                             tblPermissoesLinhas += '' + 
@@ -378,9 +380,7 @@
                                     '<span class="switch-label" data-on="SIM" data-off="NÃO"></span>' + 
                                     '<span class="switch-handle"></span>' + 
                                     '</label>' + 
-                                    // '</label>' + obj.ativo + 
                                 '</td>' + 
-                                // '<td><button id="' + obj.id + '" onClick="ExcluirPermissao(' + obj.id + ')" class="btnExcluirPermissao btn btn-danger btn-xs" data-toggle="tooltip" title="Excluir o registro atual">Excluir</button></td>' +
                             '</tr>';
                         })
                         tblPermissoesLinhas = tblPermissoesLinhas ? tblPermissoesLinhas : '<tr><td class="text-center" colspan="4">Nenhuma Permissão concedida</td></tr>';
@@ -516,7 +516,7 @@
                             '<tr id="tr' + obj.id + '">' + 
                                 '<td>' + (i+1) + '</td>' + 
                                 '<td>' + obj.model + '</td>' + 
-                                '<td class="text-center">' + ( obj.id > 9 ?  
+                                '<td class="text-center">' + ( obj.id > 6 ?  
                                     '<label class="switch">' + 
                                     '<input type="checkbox" id="' + obj.id + '" ' + obj.concedido + ' data-perfil_id="' + id + '" data-entidade_id="' + obj.id + '" class="switch-input" data-toggle="tooltip" title="Incluir">' + 
                                     '<span class="switch-label" data-on="SIM" data-off="NÃO"></span>' + 

@@ -1,16 +1,13 @@
 <?php
 
-use App\Http\Controllers\ApiController;
 use App\Http\Controllers\AutorizacaoController;
 use App\Http\Controllers\EntidadeController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\JwtController;
 use App\Http\Controllers\OrganizacaoController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\RotaController;
 use App\Http\Controllers\SistemaController;
 use App\Http\Controllers\UserController;
-use App\Http\Requests\OrganizacaoRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate as FacadesGate;
 use Illuminate\Support\Facades\Route;
@@ -38,22 +35,17 @@ Auth::routes();
      *       e é criado um Gate dinâmico para cada Rota que será usada no controle de autorizações 
      *       via middleware logo abaixo.
      * 
-     *       2. Decomente abaixo para ver todas autorizações do User logado
+     *       2. Descomente abaixo para ver todas autorizações do User logado
      *          dd(FacadesGate::abilities());
      */
     // dd(FacadesGate::abilities());
 
-
-
-    // Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
-        // Auth::logout();
-        // Auth::loginUsingId(1);
-        // Auth::login($user);
-        // Auth::check();
-
-        // dd(auth()->id());
-        // dd(Auth::id());
+    // Auth::logout();
+    // Auth::loginUsingId(1);
+    // Auth::login($user);
+    // Auth::check();
+    // dd(auth()->id());
+    // dd(Auth::id());
 
     /**
      * todas as rotas da aplicação são acessíveis somente após o Usuário estar autenticado
@@ -73,13 +65,13 @@ Auth::routes();
 
         // O middleware('AccessControlList') controla as autorizações para todas as rotas da aplicação
         // as autorizações estão gravadas em tabelas Perfils, Permissaos, Entidades relacionadas ao Usuário logado
-        Route::middleware('AccessControlList')->group(function () {
+        // Route::middleware('AccessControlList')->group(function () {
+        Route::middleware(['auth', 'AccessControlList'])->group(function () {
 
             // Gestão de Usuários
             Route::controller(UserController::class)->group(function () {
                 Route::get('/user', 'index')->name('user.index');
                 Route::get('user/show', 'show')->name('user.show');
-                // Route::post('user/edit', 'edit')->name('user.edit');
                 Route::post('user/store', 'store')->name('user.store');
                 Route::post('user/destroy', 'destroy')->name('user.destroy');
                 Route::post('user/listarPerfis', 'listarPerfis')->name('user.listarPerfis');
@@ -90,7 +82,6 @@ Auth::routes();
             Route::controller(PerfilController::class)->group(function () {
                 Route::get('/perfil', 'index')->name('perfil.index');
                 Route::get('/perfil/{user_id?}','show')->name('perfil.show');
-                // Route::post('perfil/edit', 'edit')->name('perfil.edit');
                 Route::post('perfil/store', 'store')->name('perfil.store');
                 Route::post('perfil/destroy', 'destroy')->name('perfil.destroy');
                 Route::post('perfil/concederEntidade', 'concederEntidade')->name('perfil.concederEntidade');
@@ -100,7 +91,6 @@ Auth::routes();
             Route::controller(EntidadeController::class)->group(function () {
                 Route::get('/entidade', 'index')->name('entidade.index');
                 Route::get('entidade/show', 'show')->name('entidade.show');
-                // Route::post('entidade/edit', 'edit')->name('entidade.edit');
                 Route::post('entidade/store', 'store')->name('entidade.store');
                 Route::post('entidade/destroy', 'destroy')->name('entidade.destroy');
                 Route::get('entidade/rotas', 'rotas')->name('entidade.rotas');
@@ -134,10 +124,10 @@ Auth::routes();
     
             // SPA Permissões (Autorizações) de Acesso na Entidade: Organização (tabela acl_organizacaos)
             Route::controller(OrganizacaoController::class)->group(function () {
-                Route::get('/organizacao',          'index')->name('organizacao.index');
-                Route::get('/organizacao/{id?}',    'show')->name('organizacao.show');
-                Route::post('organizacao/store',    'store')->name('organizacao.store');
-                Route::post('organizacao/update',   'edit')->name('organizacao.update');                
+                Route::get('organizacao',           'index')->name('organizacao.index');
+                Route::get('organizacao/{id?}',     'show')->name('organizacao.show');
+                Route::post('organizacao/store',    'store')->name('organizacao.store');        // insert no registro
+                Route::post('organizacao/update',   'update')->name('organizacao.update');      // update no registro        
                 Route::post('organizacao/destroy',  'destroy')->name('organizacao.destroy');
             });              
     

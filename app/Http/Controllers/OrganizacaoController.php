@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Http\Requests\OrganizacaoRequest;
 use App\Http\Resources\OrganizacaoResource;
 use App\Models\Organizacao;
-use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Gate;
 
 class OrganizacaoController extends Controller
@@ -38,8 +37,25 @@ class OrganizacaoController extends Controller
             // Retorna os dados no formato esperado pelo DataTables com data[]
             // return response()->json(['data' => $organizacaos]);            
 
-            // retorna os dados customizados aplicando o OrganizacaoResource() que automaticamente adiciona o data[] poderá retiar o 'sistemas' se não programado
-            return OrganizacaoResource::collection($organizacaos);            
+            // retorna os dados customizados aplicando o OrganizacaoResource() que automaticamente adiciona o data[] poderá retirar o 'sistemas' se não programado
+
+
+            // Adicionar a coluna 'autorizacoes' na Collection a cada organização: function (User $user) use ($autorizacao) 
+            $autorizacoes = $this->getAbilities();  
+
+            $organizacaos->each(function ($organizacao) use ($autorizacoes)  {  // Collection
+                $organizacao->setAttribute('autorizacoes', $autorizacoes);
+            });          
+
+            return [
+                'data' => $organizacaos,
+                'autorizacoes' => $autorizacoes,
+            ];
+
+            // return [
+            //     'data' => OrganizacaoResource::collection($organizacaos),
+            //     'autorizacoes' => $this->getAbilities(),
+            // ];
 
             // retorna SEM customizar os dados e SEM o data[] exigindo que a diretiva dataSrc: "" no ajax
             // return response()->json($organizacaos);     
@@ -64,8 +80,27 @@ class OrganizacaoController extends Controller
     public function show(Request $request)
     {        
         $organizacao = Organizacao::where('id', $request->id)->first();
+        $organizacao['ACLupdate'] = Gate::allows('organizacao.update');     // devolve true se o User tem permissão para Update
+
         return response()->json($organizacao);
     }      
+
+    public function store(OrganizacaoRequest $request)
+    {
+        $organizacao = Organizacao::Create(
+            $request->only(['nome', 'sigla', 'descricao', 'ativo'])
+        );  
+
+        return response()->json($organizacao);
+    }     
+
+    public function update(OrganizacaoRequest $request)
+    {
+        $organizacao = Organizacao::findOrFail($request->id);
+        $organizacao->update($request->only(['nome', 'sigla', 'descricao', 'ativo']));
+
+        return response()->json($organizacao);
+    }     
 
     public function destroy(Request $request)
     {        
@@ -73,13 +108,27 @@ class OrganizacaoController extends Controller
         return response()->json($organizacao);
     }   
 
-    public function store(OrganizacaoRequest $request)
+    /**
+     * mover para um classe superior genérica
+     * Retorna um array com todas as habilidades (ações/rotas autorizadas) do User logado as quais foram definidas com Gate::define()
+     */
+    protected function getAbilities()
     {
-        $organizacao = Organizacao::updateOrCreate(
-            ['id' => $request->id],
-            $request->only(['nome', 'sigla', 'descricao', 'ativo'])
-        );  
+        $rotasAutorizadas = [];
 
-        return response()->json($organizacao);
-    }     
+        // recupera um Collection de closures (Funcções Anônimas) nesse caso que espera um User como parâmetro: "user.index" => Closure(User $user)
+        $abilities = Gate::abilities();
+
+        // extrai no array apenas a chave com o nome das abilities (ações autorizadas ou seja rotas autorizadas)
+        foreach ($abilities as $ability => $callback) {
+            if (stripos($ability, 'organizacao') !== false) {
+                $rotasAutorizadas[] = $ability;
+            }
+        }        
+        // print_r($rotasAutorizadas);
+        // die();
+
+        return $rotasAutorizadas;
+    }        
+
 }

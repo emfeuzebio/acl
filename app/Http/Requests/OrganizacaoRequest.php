@@ -11,7 +11,9 @@ class OrganizacaoRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;    //true = não necessita estar logado
+        // return true;                // padrão é true = não necessita estar logado
+        return auth()->check();     // Verifica se o usuário está autenticado    
+        // return auth()->user() && auth()->user()->role === 'admin';  // Apenas usuários admin    
     }
 
     /**

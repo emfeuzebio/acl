@@ -25,6 +25,9 @@ class Autorizacao extends Model
         return $this->belongsTo(Perfil::class);
     }    
 
+    // public function perfis() {
+    //     return $this->belongsToMany(Perfil::class,'acl_perfil_user');
+    // }
 
     // public function acao() {
     //     return $this->hasOne(Rota::class);

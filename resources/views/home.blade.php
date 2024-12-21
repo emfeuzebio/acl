@@ -7,7 +7,15 @@
 @stop
 
 @section('content')
+
+    @if(session()->has('error'))
+        <div class="alert alert-info">
+            {{ session()->get('error') }}
+        </div>
+    @endif    
+
     <p>Welcome to this beautiful admin panel.</p>
+
 @stop
 
 @section('css')

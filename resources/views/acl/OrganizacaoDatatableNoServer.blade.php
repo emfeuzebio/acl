@@ -1,6 +1,7 @@
 @extends('adminlte::page')
 
 @section('content_header')
+
     <div class="row mb-2">
         <div class="m-0 text-dark col-sm-6">
             <h1></h1>
@@ -14,6 +15,12 @@
             </ol>
         </div>
     </div>
+
+    <style>
+        .dt-center {
+            text-align: center !important;
+        }       
+    </style>    
 @stop
 
 @section('content')
@@ -38,7 +45,7 @@
                                                 
                         <div class="col-md-3 text-right">
                             <button id="btnRefresh" class="btn btn-default btn-sm btnRefresh" data-toggle="tooltip" title="Atualizar a tabela (Alt+R)">Refresh</button>
-                            <button id="btnNovo"    class="btnInserirNovo btn btn-success btn-sm" data-toggle="tooltip" title="Adicionar um novo registro (Alt+N)" >Inserir Novo</button>
+                            <button id="btnNovo" class="btn btn-success btn-sm btnInserirNovo" style="display: none;" data-toggle="tooltip" title="Adicionar um novo registro (Alt+N)" >Inserir Novo</button>
                         </div>
                     </div>
                 </div>
@@ -103,35 +110,32 @@
 
             </div>
             <div class="modal-footer">
-                <div class="col-md-5 text-left">
+                <div class="col-md-6 text-left">
                     <label id="msgOperacao" class="error invalid-feedback" style="color: red; display: none; font-size: 12px;"></label> 
                 </div>
                 <div class="col-md-5 text-right">
                     <button type="button" class="btn btn-secondary btnCancelar" data-bs-dismiss="modal" data-toggle="tooltip" title="Cancelar a operação (Esc ou Alt+C)" onClick="$('#editarModal').modal('hide');">Cancelar</button>
-                    @can('is_admin')
-                    <button type="button" class="btn btn-primary btnSalvar" id="btnSalvar" data-toggle="tooltip" title="Salvar o registro (Alt+S)">Salvar</button>
-                    @endcan
-                    <button type="button" class="btn btn-primary btnSalvar" id="btnSalvar" data-toggle="tooltip" title="Salvar o registro (Alt+S)">Salvar</button>
+                    <button type="button" class="btn btn-primary btnSalvar" style="display: none;" id="btnSalvar" data-operacao="salvar" data-toggle="tooltip" title="Salvar o registro (Alt+S)">Salvar</button>
+                    <button type="button" class="btn btn-success btnSalvar" style="display: none;" id="btnInserir" data-operacao="inserir" data-toggle="tooltip" title="Inserir o registro (Alt+S)">Inserir</button>
                 </div>
-        </div>
             </div>
         </div>
     </div>
 
-    <!-- modal Excluir registro -->
+    <!-- modal excluir registro -->
     <div class="modal fade" id="confirmaExcluirModal" tabindex="-1" aria-hidden="true" data-backdrop="static">
-        <div class="modal-dialog modal-sm">
+        <div class="modal-dialog modal-sm" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">Excluir Registro</h4>
-                    <button type="button" class="close" data-bs-dismiss="modal" data-toggle="tooltip" title="Cancelar a operação (Esc ou Alt+C)" onClick="$('#confirmaExcluirModal').modal('hide');">&times;</button>
+                    <button type="button" class="close btnCancelar" data-bs-dismiss="modal" data-toggle="tooltip" title="Cancelar a operação (Esc ou Alt+C)" onClick="$('#msgOperacaoExcluir').text('');$('#confirmaExcluirModal').modal('hide');">&times;</button>
                 </div>
                 <div class="modal-body">
                     <p></p>
                     <label id="msgOperacaoExcluir" class="error invalid-feedback" style="color: red; display: none; font-size: 12px;"></label> 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-toggle="tooltip" title="Cancelar a operação (Esc ou Alt+C)" onClick="$('#confirmaExcluirModal').modal('hide');">Cancelar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-toggle="tooltip" title="Cancelar a operação (Esc ou Alt+C)" onClick="$('#msgOperacaoExcluir').text('');$('#confirmaExcluirModal').modal('hide');">Cancelar</button>
                     <button type="button" class="btn btn-danger" data-toggle="tooltip" title="Confirmar a Exclusão" id="confirm">Excluir</button>
                 </div>
             </div>
@@ -140,7 +144,7 @@
 
     <!-- modal para exibir Alertas necessários -->
     <div class="modal fade" id="alertModal" tabindex="-1" aria-hidden="true" data-backdrop="static">
-        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">            
+        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header alert-warning">
                     <h4 class="modal-title">Alerta</h4>
@@ -159,13 +163,18 @@
 
         $(document).ready(function () {
 
-            const ERROR_HTTP_STATUS = new Set([401, 419]); // 401-UNAUTHORIZED, 403-FORBIDDEN, 419-PAGE_EXPIRED, 404-NOT_FOUND, 500-INTERNAL_SERVER_ERROR
             var id = '';
+            var autorizacoes = '';
+            var btnInserir = '';
+            var btnEditar = '';
+            var btnExcluir = '';
 
-            // valida o X-CSRF-TOKEN
+            /** 
+             * gerencia o X-CSRF-TOKEN e redireciona para login caso não autenticado
+             */
             $.ajaxSetup({
-                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-                statusCode: { 401: function() { window.location.href = "/login";} }
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },  // valida o X-CSRF-TOKEN
+                statusCode: { 401: function() { window.location.href = "/login";} },        // 401-UNAUTHORIZED redireciona para login
             });
 
             /*
@@ -178,13 +187,35 @@
                 autoWidth: true,
                 // order: [ 0, 'desc' ],
                 lengthMenu: [[5, 10, 15, 30, 50, -1], [5, 10, 15, 30, 50, "Todos"]], 
-                // url: "organizacao",                
-                ajax: {
-                    // dataSrc: "",                 // descarta a necessidade do data[]
-                    url: "organizacao",             // rota
-                    data: { pessoa_id: '6' },       // enviar parametro para o Controller no GET
-                },                
                 language: { url: "{{ asset('vendor/datatables/DataTables.pt_BR.json') }}" },
+                ajax: {
+                    type: "GET",
+                    url: "organizacao",                             // rota
+                    // dataSrc: '',                                 // '' descarta a necessidade do data[] mas precisa estar de acordo com o Controller
+                    // data: { param1: 'x' },                       // enviar parametro fixo via GET para o Controller
+                    data: function(param) {                         // enviar parametro dinâmico via GET para o Controller
+                        param.tipo = 'tipo';                        // Adiciona o valor do campo #tipo aos parâmetros da requisição
+                        param.forma = 'forma';                      // Adiciona o valor do campo #forma aos parâmetros da requisição
+                    },
+                    dataSrc: function (json) {
+                        let autorizacoes = json.autorizacoes;                   // Rotas autorizadas
+                        // console.log(autorizacoes);                        // Rotas autorizadas
+
+                        // controle do botão Inserir Novo
+                        if (json.autorizacoes.includes('organizacao.store')) { $("#btnNovo").show(); } else { $("#btnNovo").hide(); }
+
+                        // controle do botão Salvar do Modal de Edição
+                        if (json.autorizacoes.includes('organizacao.update')) { $("#btnSalvar").show(); } else { $("#btnSalvar").hide(); }
+
+                        return json.data;                           // Retorna lista de dados para o DataTables
+                    },
+                    error: function(xhr, status, error) {
+                        // para evitar erros visívies no  DataTables 
+                        if (xhr.status == 401) { window.location.href = "{{ url('/login')}}";}     // 401-UNAUTHORIZED envia para login
+                        if (xhr.status == 403) { window.location.href = "{{ url('/home') }}";}     // 403-FORBIDDEN envia para home
+                    }
+                },   
+                rowId: 'id',    // seta o id="" da TR como sendo o campo: id
                 columns: [
                     {"data": "id", "name": "organizacaos.id", "class": "dt-right", "title": "#"},
                     {"data": "nome", "name": "organizacaos.nome", "class": "dt-left", "title": "Nome",
@@ -194,12 +225,32 @@
                     {"data": "ativo", "name": "organizacaos.ativo", "class": "dt-center", "title": "Ativo",  
                         render: function (data) { return '<span class="' + ( data == 'SIM' ? 'text-primary' : 'text-danger') + '">' + data + '</span>';}
                     },
-                    {"data": "id", "botoes": "", "orderable": false, "class": "dt-center", "title": "Ações", 
-                        render: function (data, type) { 
-                            return '<button data-id="' + data.id + '" class="btnExcluir btn btn-danger btn-xs" data-toggle="tooltip" title="Excluir o registro atual">Excluir</button><button data-id="' + data.id + '" class="btnEditar  btn btn-primary btn-xs" data-toggle="tooltip" title="Editar o registro atual">Editar</button>'; 
+                    {"data": null, "botoes": "", "orderable": false, "class": "dt-center", "title": "Ações", "width": "80px",
+                        render: function (data, type, row) { 
+
+                            btnEditar = '';                 // esconde botoes
+                            btnExcluir = '';                // esconde botoes
+                            // console.log(data);
+
+                            // controle botão Ver
+                            if (row.autorizacoes.includes('organizacao.show')) {
+                                btnEditar = '<button type="button" class="btnEditar btn btn-info btn-xs" data-operacao="ver" data-toggle="tooltip" title="Ver o registro atual">Ver</button> ';
+                            }
+
+                            // // controle botão Editar
+                            if (row.autorizacoes.includes('organizacao.update')) {
+                                btnEditar = '<button type="button" class="btnEditar btn btn-primary btn-xs" data-operacao="salvar" data-toggle="tooltip" title="Editar o registro atual">Editar</button> ';
+                            }
+
+                            // // controle botão Excluir
+                            if (row.autorizacoes.includes('organizacao.destroy')) {
+                                btnExcluir = '<button type="button" class="btnExcluir btn btn-danger btn-xs" data-operacao="excluir" data-toggle="tooltip" title="Excluir o registro atual">Excluir</button> ';
+                            }
+
+                            return btnEditar + btnExcluir; 
                         }
                     },
-                ]
+                ],
             });
 
             /*
@@ -212,12 +263,14 @@
                 $('#formEntity').trigger("reset");                                  // limpa mensagens de erro
                 $('#editarModal #modalLabel').html('Inserir nova Organização');     // título do modal
                 $(".invalid-feedback").text('').hide();                             // hide all error displayed
+                $("#btnSalvar").hide();                                             // esconde o btn Salvar
+                $("#btnInserir").show();                                            // mostra o btn Inserir
                 $('#formEntity #ativo').prop('checked', true);                      // default SIM
                 $('#editarModal').modal('show');                                    // show modal 
             });              
 
             /*
-            * Editar um registro
+            * Editar ou Ver um registro (show)
             */
             $("#datatables tbody").delegate('tr td .btnEditar', 'click', function (e) {
                 e.stopImmediatePropagation();            
@@ -230,53 +283,51 @@
                     data: { "id": id },
                     dataType: 'json',
                     success: function (data) {
-                        // console.log(data);
                         $('#modalLabel').html('Editar Organização');
-                        $(".invalid-feedback").text('').hide();     //hide and clen all erros messages on the form
-                        $('#form-group-id').show();
-                        $('#editarModal').modal('show');         //show the modal
+                        $(".invalid-feedback").text('').hide();     // limpa todas as mensagens de erros dos campos
+                        $('#form-group-id').show();                 // sendo uma edição mostra o ID do registro
+                        $('#editarModal').modal('show');            // mostra o modal de edição de dados
+                        $("#btnInserir").hide();                    // mostra o btn Inserir
 
-                        // implementar que seja automático foreach   
+                        // carrega os dados nos campos.
                         $('#formEntity #id').val(data.id);
                         $('#formEntity #sigla').val(data.sigla);
                         $('#formEntity #nome').val(data.nome);
                         $('#formEntity #descricao').val(data.descricao);
                         $('#formEntity #ativo').prop('checked', (data.ativo == "SIM" ? true : false));
+
+                        // controla o botão Salvar conforme o ACL Gate
+                        if (data.ACLupdate) { $("#btnSalvar").show(); } else { $("#btnSalvar").hide(); }
                     },
                     error: function (error) {
-                        //if ([403, 413, 419].includes(error.status)) { // funciona mas preferimos a constante
-                        if (ERROR_HTTP_STATUS.has(error.status)) {
-                            window.location.href = "{{ url('/login') }}";
-                            return;
-                        } 
-                        
-                        $('#alertModal .modal-body').text(error.responseJSON.message)
+                        $('#alertModal .modal-body').html(error.responseJSON.message)
                         $('#alertModal').modal('show');
                     }
                 }); 
             });           
 
             /*
-            * Excluir um registro
+            * Excluir um registro (destroy)
             */
             $("#datatables tbody").delegate('tr td .btnExcluir', 'click', function (e) {
                 e.stopImmediatePropagation();            
 
                 const id = $(this).parents('tr').attr("id");
+                // $('#editarModal').modal('show');                                    // show modal 
 
-                //abre Form Modal Bootstrap e pede confirmação da Exclusão do Registro
+                // abre Form Modal Bootstrap e pede confirmação da Exclusão do Registro
                 $('#msgOperacaoExcluir').text('');
-                $("#confirmaExcluirModal .modal-body p").text('').text('Você está certo que deseja Excluir este registro ID: ' + id + '?');
+                $("#confirmaExcluirModal .modal-body p").text('Você está certo que deseja Excluir este registro ID: ' + id + '?');
                 $('#confirmaExcluirModal').modal('show');
 
-                //se confirmar a Exclusão, exclui o Registro via Ajax
+                // se confirmar a Exclusão, exclui o Registro via Ajax
                 $('#confirmaExcluirModal').find('.modal-footer #confirm').on('click', function (e) {
                     e.stopImmediatePropagation();
 
                     $.ajax({
                         type: "POST",
                         url: "organizacao/destroy",
-                        data: {"id": id},
+                        data: { "id": id },
                         dataType: 'json',
                         success: function (data) {
                             $("#alert .alert-content").text('Excluiu o registro ID ' + id + ' com sucesso.');
@@ -285,18 +336,11 @@
                             $('#datatables').DataTable().ajax.reload(null, false);  
                         },
                         error: function (error) {
-                            if (ERROR_HTTP_STATUS.has(error.status)) {
-                                window.location.href = "{{ url('/login') }}";
-                                return;
-                            } 
-                            
                             $('#msgOperacaoExcluir').text(error.responseJSON.message).show();
                             if(error.responseJSON.message.indexOf("1451") != -1) {
                                 $('#msgOperacaoExcluir').text('Impossível EXCLUIR porque há registros relacionados. (SQL-1451)').show();
                             } else {
-                                $('#msgOperacaoExcluir').text(error.responseJSON.message).show();
-                                $('#alertModal .modal-body').text(error.responseJSON.message)
-                                $('#alertModal').modal('show');
+                                $('#msgOperacaoExcluir').html(error.responseJSON.message).show();
                             }
                         }
                     });
@@ -304,47 +348,44 @@
             });           
 
             /*
-            * Salvar o registro em edição
+            * Salvar o registro em edição (create ou update)
             */
-            $('#btnSalvar').on("click", function (e) {
+            $('.btnSalvar').on("click", function (e) {
                 e.stopImmediatePropagation();
-                $(".invalid-feedback").text('').hide();                     // hide and clean all erros messages on the form
-                var ativoValue = getAtivoValue();
 
-                // to use a button as submit button, is necesary use de .get(0) after
+                // $(".invalid-feedback").text('').hide();                     // hide and clean all erros messages on the form
+                var ativoValue = getAtivoValue();                           // recupera o ativo switch
+                var operacao = $(this).data('operacao');                    // recupera a operação
+
+                // para reunir os campos do form é necessário usar index do form .get(0)
                 const formData = new FormData($('#formEntity').get(0));
-                formData.append('ativo', ativoValue);                       // add Ativo field
+                formData.append('ativo', ativoValue);                       // adiciona o campo ativo ao formData
 
                 $.ajax({
                     type: "POST",
-                    url: "organizacao/store",
+                    url: ( operacao == 'inserir' ? 'organizacao/store' : 'organizacao/update'), // ajusta a rota conforme a operação
                     data: formData,
-                    cache: false,
-                    contentType: false,
+                    dataType: 'json',
                     processData: false,
-                    success: function (data) {
-                        $("#alert .alert-content").text('Salvou registro ID ' + data.id + ' com sucesso.');
+                    contentType: false,
+                    success: function (response) {
+                        $("#alert .alert-content").text('Salvou registro ID ' + response.id + ' com sucesso.');
                         $('#alert').removeClass().addClass('alert alert-success').show().delay(5000).fadeOut(1000);
                         $('#editarModal').modal('hide');
                         $('#datatables').DataTable().ajax.reload(null, false);
                     },
                     error: function (error) {
-                        if (ERROR_HTTP_STATUS.has(error.status)) { 
-                            window.location.href = "{{ url('/login') }}";
-                            return;
-                        } 
-
-                        // validator: vamos exibir todas as mensagens de erro do validador
-                        // como o dataType não é JSON, precisa do responseJSON
+                        // vamos exibir as mensagens de erro dos campos do validador
                         $("#editarModal .invalid-feedback").text('').hide();
                         $.each( error.responseJSON.errors, function( key, value ) {
                             $("#editarModal #error-" + key ).text(value).show(); 
                         });
+
                         // exibe mensagem sobre sucesso da operação
-                        if(error.responseJSON.message.indexOf("1062") != -1) {
+                        if (error.responseJSON.message.indexOf("1062") != -1) {
                             $('#msgOperacao').text("Impossível SALVAR! Registro já existe. (SQL-1062)").show();
-                        } else if(error.responseJSON.exception) {
-                            $('#msgOperacao').text(error.responseJSON.message).show();
+                        } else {
+                            $('#msgOperacao').html(error.responseJSON.message).show();
                         }
                     }
                 });                
@@ -360,16 +401,7 @@
             */            
             $('#btnRefresh').on("click", function (e) {
                 e.stopImmediatePropagation();
-                // $.ajax({
-                //     url: '/isAuthenticated',
-                //     method: 'GET',
-                //     success: function(response) {
-                //         if (!response.authenticated) window.location.href = "{{ url('/') }}";
-                //     },
-                //     error: function(jqXHR) {
-                //         if (jqXHR.status === 401) window.location.href = "{{ url('/') }}";
-                //     }
-                // });
+
                 $('#datatables').DataTable().ajax.reload(null, false);    
                 $('#alert').trigger('reset').hide();
             });        
