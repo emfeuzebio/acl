@@ -23,9 +23,9 @@ class OrganizacaoResource extends JsonResource
             "sigla" => $this->sigla,
             "descricao" => $this->descricao,
             "ativo" => $this->ativo,
-            'sistemas' => $this->sistemas,              // inclui o relacionamento 'sistemas'
             "criado_em" => $this->created_at ? $this->created_at->format('d/m/Y H:i:s') : null,
             "atualizado_em" => $this->updated_at ? $this->updated_at->format('d/m/Y H:i:s') : null,
+            'sistemas' => $this->sistemas,              // inclui o relacionamento 'sistemas'
             // "atualizado_em" => $this->updated_at ? Carbon::parse($this->updated_at)->format('d/m/Y H:i:s') : null,
             // 'sistemas' => SistemaResource::collection($this->whenLoaded('sistemas')), // Aplica um recurso para a relação 'sistemas'
             // "DT_RowId" => $this->id,

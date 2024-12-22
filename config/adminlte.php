@@ -315,7 +315,7 @@ return [
         [
             'text' => 'blog',
             'url' => 'admin/blog',
-            'can' => 'manage-blog',
+            // 'can' => 'manage-blog',
         ],
         // [
         //     'text' => 'pages',

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\OrganizacaoRequest;
 use App\Http\Resources\OrganizacaoResource;
+use App\Models\Autorizacao;
 use App\Models\Organizacao;
 use Illuminate\Support\Facades\Gate;
 
@@ -22,6 +23,12 @@ class OrganizacaoController extends Controller
         //     abort(403, 'Usuário não autorizado!');
         // }        
 
+        // $autorizacaos = Autorizacao::where('ativo','=','SIM')->with('perfil')->get();
+        // $autorizacaos = Autorizacao::where('ativo','=','SIM')->with('perfil');
+        // dd($autorizacaos->toSql());
+        // dd($autorizacaos);
+
+
         if (request()->ajax()) {
 
             /**
@@ -31,7 +38,8 @@ class OrganizacaoController extends Controller
             // $organizacaos = Organizacao::all();                                          // Recupera as organizações
             // $organizacaos = OrganizacaoResource::collection(Organizacao::all());         // Recupera as organizações aplicando um Resource sobre a coleção add DT_RowId
 
-            $organizacaos = Organizacao::with('sistemas')->where('id','>=', '1')->get();    // Recupera as organizações com a relação 'sistemas', filtrando por id >= 1
+            // $organizacaos = Organizacao::with('sistemas')->where('id','>=', '1')->get();    // Recupera as organizações com a relação 'sistemas', filtrando por id >= 1
+            $organizacaos = Organizacao::where('id','>=', '1')->get();    // Recupera as organizações com a relação 'sistemas', filtrando por id >= 1
             // $organizacaos = Organizacao::with('sistemas')->where('id','=', request()->pessoa_id)->get();    // filtra pelo parametro request()->pessoa_id recebido no GET 
 
             // Retorna os dados no formato esperado pelo DataTables com data[]
@@ -117,16 +125,13 @@ class OrganizacaoController extends Controller
         $rotasAutorizadas = [];
 
         // recupera um Collection de closures (Funcções Anônimas) nesse caso que espera um User como parâmetro: "user.index" => Closure(User $user)
-        $abilities = Gate::abilities();
-
-        // extrai no array apenas a chave com o nome das abilities (ações autorizadas ou seja rotas autorizadas)
-        foreach ($abilities as $ability => $callback) {
-            if (stripos($ability, 'organizacao') !== false) {
-                $rotasAutorizadas[] = $ability;
+        foreach (Gate::abilities() as $ability => $callback) {
+            if (Gate::allows($ability)) {
+                if (stripos($ability, 'organizacao') !== false) {
+                    $rotasAutorizadas[] = $ability;  // Adiciona a ability ao array se o usuário tiver permissão
+                }
             }
         }        
-        // print_r($rotasAutorizadas);
-        // die();
 
         return $rotasAutorizadas;
     }        

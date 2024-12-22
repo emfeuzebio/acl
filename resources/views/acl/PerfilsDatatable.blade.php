@@ -516,7 +516,7 @@
                             '<tr id="tr' + obj.id + '">' + 
                                 '<td>' + (i+1) + '</td>' + 
                                 '<td>' + obj.model + '</td>' + 
-                                '<td class="text-center">' + ( obj.id > 6 ?  
+                                '<td class="text-center">' + ( obj.id > 5 ?  
                                     '<label class="switch">' + 
                                     '<input type="checkbox" id="' + obj.id + '" ' + obj.concedido + ' data-perfil_id="' + id + '" data-entidade_id="' + obj.id + '" class="switch-input" data-toggle="tooltip" title="Incluir">' + 
                                     '<span class="switch-label" data-on="SIM" data-off="NÃO"></span>' + 

@@ -120,9 +120,7 @@
                 </div>
                 <div class="col-md-5 text-right">
                     <button type="button" class="btn btn-secondary btnCancelar" data-bs-dismiss="modal" data-toggle="tooltip" title="Cancelar a operação (Esc ou Alt+C)" onClick="$('#editarModal').modal('hide');">Cancelar</button>
-                    @can('is_admin')
                     <button type="button" class="btn btn-primary btnSalvar" id="btnSalvar" data-toggle="tooltip" title="Salvar o registro (Alt+S)">Salvar</button>
-                    @endcan
                     <button type="button" class="btn btn-primary btnSalvar" id="btnSalvar" data-toggle="tooltip" title="Salvar o registro (Alt+S)">Salvar</button>
                 </div>
         </div>

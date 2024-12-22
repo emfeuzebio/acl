@@ -16,8 +16,6 @@ class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    public $Roles = [];
-
     /**
      * The attributes that are mass assignable.
      *
@@ -49,6 +47,14 @@ class User extends Authenticatable implements JWTSubject
         'password' => 'hashed',
     ];
 
+    public $Roles = [];
+
+    public function __construct() {
+    }    
+
+    public function index() {
+    }
+
     public function perfis() {
         return $this->belongsToMany(Perfil::class,'acl_perfil_user');
     }
@@ -61,17 +67,22 @@ class User extends Authenticatable implements JWTSubject
      * Recebe a Autorização com a Rota
      * Retorna TRUE se dentre os Perfis do Usuário Logado, ele têm autorização nesta Rota
      */
-    public function hasAutorizacao(Autorizacao $autorizacao) {
+    public function hasAnyPerfis($roleIds) {
 
         // vamos carregar os Perfis (Roles) do User a partir do relacionamento (perfis)
         $this->Roles = $this->getRoles();
-        // dd($this->Roles);
 
-        // return in_array($autorizacao->perfil->id, $this->Roles);       // Ok
-        // return in_array($autorizacao->perfil->id, $this->getRoles());  // Ok
-        return in_array($autorizacao->perfil->id, Auth::user()->Roles);   // Ok
+        // echo '<pre>Verifica se alguns dos Perfis da Rota: <br/>';
+        // print_r($roleIds);
+        // echo 'Estão na lista de Perfis do User: <br/>';
+        // print_r(Auth::user()->Roles);
+        // echo '</pre>';
+        // die();
 
-        // return $this->hasAnyPerfis($autorizacao->perfil);              // ANTERIOR pesquisava no BD 
+        // Verifica se pelo menos um elemento de $roleIds está presente em $roles
+        if (count(array_intersect(Auth::user()->Roles, $roleIds)) > 0) {
+            return true;
+        } 
     }
 
     protected function getRoles()
@@ -79,12 +90,7 @@ class User extends Authenticatable implements JWTSubject
         return $this->perfis->pluck('id')->toArray();                     // Pluck os id das roles (perfis)
     }    
 
-    protected function hasAnyPerfis(Perfil $perfil) {
-
-        // echo 'User(' . Auth::user()->id . ') Perfil (' . $perfil->id . ')';
-        // dd($perfil);
-        // $userId = Auth::user()->id;
-        // dd($userId);
+    protected function hasAnyPerfisOLD(Perfil $perfil) {
 
         $sql = "
             SELECT EXISTS (
@@ -94,12 +100,9 @@ class User extends Authenticatable implements JWTSubject
                 AND acl_perfil_user.perfil_id = ?
             ) AS tem_perfil
         ";
-        // $results = DB::select($sql,[Auth::user()->id, $perfil->id]);
         // echo $results;
-        // dd($results[0]->tem_perfil);
-        $results = DB::selectOne($sql,[Auth::user()->id, $perfil->id]); // retorna objeto row()
+        $results = DB::selectOne($sql,[Auth::user()->id, $perfil->id]); // retorna uma row() objeto
 
-        // return ((bool) $results[0]->tem_perfil);
         return ((bool) $results->tem_perfil);   // retorna boolean
     }
 
@@ -112,31 +115,5 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
-
-    // public function getAutorizacoes()
-    // {
-
-    //     $sql = "
-    //         SELECT
-    //                 acl_perfil_user.user_id
-    //             , acl_perfil_user.perfil_id
-    //             , acl_rotas.rota
-    //         FROM acl_perfil_user
-    //             INNER JOIN acl_autorizacaos ON acl_autorizacaos.perfil_id = acl_perfil_user.perfil_id
-    //             INNER JOIN acl_rotas        ON acl_rotas.id = acl_autorizacaos.rota_id
-    //         WHERE acl_perfil_user.user_id = ?
-    //             AND acl_autorizacaos.ativo = 'SIM'
-    //         ORDER BY 
-    //                 acl_perfil_user.user_id
-    //             , acl_perfil_user.perfil_id
-    //             , acl_rotas.rota
-    //     ";
-    //     $autorizacaosDoUser = DB::select($sql, [Auth::user()->id]);
-    //     print_r($autorizacaosDoUser);
-    //     // die();
-
-    //     return $autorizacaosDoUser;
-    // }
-
 
 }
