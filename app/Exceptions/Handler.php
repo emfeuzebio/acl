@@ -37,11 +37,11 @@ class Handler extends ExceptionHandler
             
             if ($request->wantsJson()) {
                 // Se for uma requisição Ajax (JSON), vamos enviar uma resposta JSON
-                return response()->json(['message' => 'Rota: ' . $routeName . ' <b> não autorizada.</b>'], Response::HTTP_FORBIDDEN); // 403
+                return response()->json(['message' => 'Ação/Rota: ' . $routeName . ' <b> não autorizada.</b>'], Response::HTTP_FORBIDDEN); // 403
             }
 
             // Caso contrário, vamos redirecionar o usuário para a página Home ou uma personalizada
-            return redirect()->route('home')->with('error', "Rota: '" . $routeName . "' não autorizada.");
+            return redirect()->route('home')->with('error', "Ação/Rota: '" . $routeName . "' não autorizada.");
         });   
     }
 

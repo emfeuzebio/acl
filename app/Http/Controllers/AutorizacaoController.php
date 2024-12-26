@@ -35,7 +35,7 @@ class AutorizacaoController extends Controller
         // $Autorizacao = Autorizacao::where('perfil_id', $request->perfil_id)->where('rota_id', $request->rota_id)->first();
         
         // Encontre a Autorizacao com base no id 
-        $Autorizacao = Autorizacao::where('id', $request->autorizacao_id)->first();
+        $Autorizacao = Autorizacao::where('id', $request->id)->first();
         $Autorizacao->ativo = $request->ativo;    
         $Autorizacao->save();
 

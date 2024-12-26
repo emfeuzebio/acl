@@ -51,14 +51,16 @@ class UserController extends Controller
 
     public function listarPerfis(Request $request) {
 
-        $Perfis = Perfil::orderBy('id')->get();
+        $perfis = Perfil::orderBy('id')->get();
+        // print_r($perfis);
+        // $perfis = $user->perfis()->where('status', 'ativo')->orderBy('nome')->get();
 
-        foreach($Perfis as $key => $perfil) {
+        foreach($perfis as $key => $perfil) {
             $resp = DB::select('SELECT COUNT(*) AS qtd FROM acl_perfil_user WHERE user_id = ? AND perfil_id = ? ',[$request->id, $perfil->id]);
-            $Perfis[$key]['concedido'] = $resp[0]->qtd > 0 ? 'checked' : '';
+            $perfis[$key]['concedido'] = $resp[0]->qtd > 0 ? 'checked' : '';
         }
 
-        return Response()->json($Perfis);        
+        return Response()->json($perfis);        
     }
 
     public function concederPerfil(Request $request) {

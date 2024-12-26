@@ -403,6 +403,7 @@
                     },                    
                 },
                 // language: { url: "{{ asset('vendor/datatables/DataTables.pt_BR.json') }}" },
+                rowId: 'id',
                 columns: [
                     {"data": "id", "name": "users.id", "class": "dt-right", "title": "#", "width": "30px"},
                     {"data": "name", "name": "users.name", "class": "dt-left", "title": "Nome", "width": "150px",
@@ -525,12 +526,11 @@
                     },
                     error: function (error) {
                         if (ERROR_HTTP_STATUS.has(error.status)) { window.location.href = "{{ url('/login') }}"; return; } 
-                        $('#alertModal .modal-body').text(error.responseJSON.message)
+                        $('#alertModal .modal-body').html(error.responseJSON.message)
                         $('#alertModal').modal('show');
                     }
                 }); 
             });
-
 
             /**
              * ações ao clicar sobre os checkbox e mudar seu estado: tr td :checkbox
@@ -545,7 +545,7 @@
                 $.ajax({
                     type: "POST",
                     url: "{{url("autorizacao/authorizar")}}",
-                    data: { "autorizacao_id":autorizacao_id, "ativo":ativo },
+                    data: { "id":autorizacao_id, "ativo":ativo },
                     // data: { "perfil_id":perfil_id, "rota_id":rota_id, "ativo":ativo },
                     dataType: 'json',
                     success: function (data) {
@@ -561,7 +561,7 @@
 
                         // retorna o checkbox para o estado anterior
                         $('#'+chkObjeto).prop('checked', (ativo == 'SIM' ? false : true));               
-                        $('#alertModal .modal-body').text(error.responseJSON.message)
+                        $('#alertModal .modal-body').html(error.responseJSON.message)
                         $('#alertModal').modal('show');   
                     }
                 });                 
@@ -603,7 +603,7 @@
                             return;
                         } 
 
-                        $('#alertModal .modal-body').text(error.responseJSON.message)
+                        $('#alertModal .modal-body').html(error.responseJSON.message)
                         $('#alertModal').modal('show');
                     }
                 });                 
@@ -732,7 +732,8 @@
             $("#datatables-users tbody").delegate('tr td .btnConcederPerfil', 'click', function (e) {
                 e.stopImmediatePropagation();                
 
-                const id = $(this).parents('tr').attr("id");
+                // const id = $(this).parents('tr').attr("id");
+                      id = $(this).parents('tr').attr("id");
                 const user_nome = $(this).parents('tr').find('td:eq(1)').text();
                 // alert('btnConcederPerfil ' + id);
 
@@ -777,7 +778,7 @@
                             return;
                         } 
 
-                        $('#alertModal .modal-body').text(error.responseJSON.message)
+                        $('#alertModal .modal-body').html(error.responseJSON.message)
                         $('#alertModal').modal('show');
                     }
                 }); 
@@ -813,7 +814,7 @@
 
                         $('#' + chkObjeto + ':checkbox').prop('checked', (chkCheked == 'SIM' ? false : true));
                         // alert($('#' + chkObjeto).is(":checked"));
-                        $('#alertModal .modal-body').text(error.responseJSON.message)
+                        $('#alertModal .modal-body').html(error.responseJSON.message)
                         $('#alertModal').modal('show');                        
                     }
                 });                 

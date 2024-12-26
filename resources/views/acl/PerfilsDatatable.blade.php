@@ -278,7 +278,9 @@
 
         $(document).ready(function () {
 
-            let entidadePadrao = 0;
+            let entidadePadrao = 9;
+            let verEntidadePadrao = false;       // flag controla a visualização ou não das Entidade Padrão do ACL - por nas prefernecias
+            // let verEntidadePadrao = true;
             let id = '';
             let btnAcoes = '';
 
@@ -287,41 +289,92 @@
                 statusCode: { 401: function() { window.location.href = "/login"; } }
             });
 
-            // Admin pode tudo
-            btnAcoes  = '<button class="btnPerfilEditar btn btn-primary btn-xs" data-toggle="tooltip" title="Editar o registro atual">Editar</button> ';
-            btnAcoes += '<button class="btnExcluir btn btn-danger btn-xs" data-toggle="tooltip" title="Excluir o registro atual">Excluir</button> ';
-            // btnAcoes += '<button class="btnPerfis btn btn-info btn-xs" data-toggle="tooltip" title="Editar o Perfis de Acesso do Usuário atual">Perfis</button> '; 
-
             /*
             * Cria a datatables da Entidade
             */
             $('#datatables-perfils').DataTable({
                 processing: true,
-                serverSide: true,
+                // serverSide: true,
                 responsive: true,
                 autoWidth: true,
                 // order: [ 1, 'asc' ],
                 lengthMenu: [[5, 10, 15, 30, 50, -1], [5, 10, 15, 30, 50, "Todos"]], 
                 pageLength: 10,
-                ajax: "{{url("perfil")}}",
+                // ajax: "{{url("perfil")}}",
+                ajax: {
+                    type: "GET",
+                    url: "{{url("perfil")}}",                             // rota
+                    dataSrc: function (json) {
+                        let autorizacoes = json.autorizacoes;           // Rotas autorizadas
+                        // console.log(autorizacoes);                   // Rotas autorizadas
+
+                        // controle do botão Inserir Novo
+                        if (json.autorizacoes.includes('perfil.store')) { $("#btnPerfilNovo").show(); } else { $("#btnPerfilNovo").hide(); }
+
+                        // controle do botão Salvar do Modal de Edição
+                        if (json.autorizacoes.includes('perfil.update')) { $("#btnPerfilSalvar").show(); } else { $("#btnPerfilSalvar").hide(); }
+                        
+
+                        return json.data;                           // Retorna lista de dados para o DataTables
+                    },                    
+                },                
                 // language: { url: "{{ asset('vendor/datatables/DataTables.pt_BR.json') }}" },
+                rowId: 'id',
                 columns: [
                     {"data": "id", "name": "acl_perfils.id", "class": "dt-right", "title": "#", "width": "30px"},
                     {"data": "nome", "name": "acl_perfils.nome", "class": "dt-left", "title": "Perfil de Acesso", "width": "150px",
                         render: function (data) { 
                             return '<b>' + data + '</b>';}},
                     {"data": "descricao", "name": "acl_perfils.descricao", "class": "dt-left", "title": "Descrição", "width": "300px"},
-                    {"data": "entidades", "entidades": "", "orderable": false, "class": "dt-left", "title": "Autorizações", "width": "auto",
+                    {"data": "entidades", "entidades": "", "orderable": false, "class": "dt-left", "title": "Entidades e Autorizações", "width": "auto",
                         render: function(data, type, row) {
-                            return '<button class="btn btn-xs btn-success btnNovoEntidade" data-toggle="tooltip" title="Administrar Entidades concedidas a este Perfil">Administrar</button> ' + $.map(data, function(d, i) {
-                                return '<button id="' + d.id + '" class="btn btn-xs btn-' + ( d.id <= entidadePadrao ? 'default' : 'info btnEntidadeEditar' ) + '" data-toggle="tooltip" title="' + ( d.id <= entidadePadrao ? 'Entidade Padrão não pode ser editada.' : 'Administrar as Permissões concedidas à Entidade' ) + ' (' + d.model + ')">' + d.model + '</button> ';
-                            }).join(' ');
+
+                            btnConcederEntidade = '';         // esconde botoes
+
+                            // controle botão Ver
+                            if (row.autorizacoes.includes('perfil.concederEntidade')) {
+                                btnConcederEntidade = '<button class="btn btn-xs btn-success btnConcederEntidade" data-toggle="tooltip" title="Administrar Entidades concedidas a este Perfil">Administrar</button> ';
+                            }
+
+                            // controla a lista de Entidades, se verEntidadePadrao == true mostra todas, senão apenas as demais do ACL
+                            if (verEntidadePadrao) {
+                                return btnConcederEntidade + $.map(data, function(d, i) {
+                                    return '<button id="' + d.id + '" class="btn btn-xs btn-' + ( d.id <= entidadePadrao ? 'default' : 'info btnEntidadeEditar' ) + '" data-toggle="tooltip" title="' + ( d.id <= entidadePadrao ? 'Entidade Padrão não pode ser editada.' : 'Administrar as Permissões concedidas à Entidade' ) + ' (' + d.model + ')">' + d.model + '</button> ';
+                                }).join(' '); 
+                            } else {
+                                return btnConcederEntidade + $.map(data, function(d, i) {
+                                    if (d.id > entidadePadrao) {
+                                        return '<button id="' + d.id + '" class="btn btn-xs btn-' + ( d.id <= entidadePadrao ? 'default' : 'info btnEntidadeEditar' ) + '" data-toggle="tooltip" title="' + ( d.id <= entidadePadrao ? 'Entidade Padrão não pode ser editada.' : 'Administrar as Permissões concedidas à Entidade' ) + ' (' + d.model + ')">' + d.model + '</button> ';
+                                    }
+                                }).join(' '); 
+                            }
                     }},
                     {"data": "ativo", "name": "acl_perfils.ativo", "class": "dt-center", "title": "Ativo",  
                         render: function (data) { return '<span class="' + ( data == 'SIM' ? 'text-primary' : 'text-danger') + '">' + data + '</span>';}
                     },                    
                     {"data": "id", "botoes": "", "orderable": false, "class": "dt-center", "title": "Ações", "width": "80px", 
-                        render: function (data, type) { return btnAcoes; }
+                        render: function(data, type, row) {
+
+                            btnEditar = '';                 // esconde botoes
+                            btnExcluir = '';                // esconde botoes
+
+                            // controle botão Ver
+                            if (row.autorizacoes.includes('perfil.show')) {
+                                btnEditar = '<button class="btnPerfilEditar btn btn-primary btn-xs" data-operacao="ver" data-toggle="tooltip" title="Ver o registro atual">Ver</button> ';
+                            }
+
+                            // // controle botão Editar
+                            if (row.autorizacoes.includes('perfil.update')) {
+                                btnEditar = '<button class="btnPerfilEditar btn btn-primary btn-xs" data-operacao="salvar" data-toggle="tooltip" title="Editar o registro atual">Editar</button> ';
+                            }
+
+                            // // controle botão Excluir
+                            if (row.autorizacoes.includes('perfil.destroy')) {
+                                btnExcluir = '<button class="btnExcluir btn btn-danger btn-xs" data-toggle="tooltip" title="Excluir o registro atual">Excluir</button> ';
+                            }
+
+                            return btnEditar + btnExcluir; 
+                        }
                     },
                 ]
             });
@@ -336,8 +389,8 @@
                 $('#formPerfilEditar').trigger("reset");
                 $('#modalPerfilEditar #modalLabel').html('Novo Perfil de Acesso');          
                 $(".invalid-feedback").text('').hide();                     // hide all error displayed
-                $('#formPerfilEditar #ativo').prop('checked', true);      // default SIM
-                $('#modalPerfilEditar').modal('show');                    // show modal 
+                $('#formPerfilEditar #ativo').prop('checked', true);        // default SIM
+                $('#modalPerfilEditar').modal('show');                      // show modal 
                 $('#btnPerfilSalvar').show();
                 // $('#modalPerfilEditar #model').focus();
             });            
@@ -399,7 +452,7 @@
                             return;
                         } 
 
-                        $('#alertModal .modal-body').text(error.responseJSON.message)
+                        $('#alertModal .modal-body').html(error.responseJSON.message)
                         $('#alertModal').modal('show');
                     }
                 });                 
@@ -435,7 +488,7 @@
                             return;
                         } 
 
-                        $('#alertModal .modal-body').text(error.responseJSON.message)
+                        $('#alertModal .modal-body').html(error.responseJSON.message)
                         $('#alertModal').modal('show');
 
                         // validator: vamos exibir todas as mensagens de erro do validador
@@ -485,7 +538,7 @@
                             return;
                         } 
 
-                        $('#alertModal .modal-body').text(error.responseJSON.message)
+                        $('#alertModal .modal-body').html(error.responseJSON.message)
                         $('#alertModal').modal('show');
 
                         // if (error.responseJSON.message) {
@@ -497,14 +550,14 @@
                 }); 
             });          
 
-            // $('.btnNovoEntidade').on("click", function (e) {
+            // $('.btnConcederEntidade').on("click", function (e) {
             //     e.stopImmediatePropagation();
-            $("#datatables-perfils tbody").delegate('tr td .btnNovoEntidade', 'click', function (e) {
+            $("#datatables-perfils tbody").delegate('tr td .btnConcederEntidade', 'click', function (e) {
                 e.stopImmediatePropagation();                
 
                 const id = $(this).parents('tr').attr("id");
                 const perfil_nome = $(this).parents('tr').find('td:eq(1)').text();
-                // alert('btnNovoEntidade ' + id);
+                // alert('btnConcederEntidade ' + id);
 
                 $.ajax({
                     type: "GET",
@@ -549,7 +602,7 @@
                             return;
                         } 
 
-                        $('#alertModal .modal-body').text(error.responseJSON.message)
+                        $('#alertModal .modal-body').html(error.responseJSON.message)
                         $('#alertModal').modal('show');
                     }
                 }); 
@@ -589,7 +642,7 @@
                         } 
 
                         $('#'+chkObjeto).prop('checked', (chkCheked == 'SIM' ? false : true));
-                        $('#alertModal .modal-body').text(error.responseJSON.message)
+                        $('#alertModal .modal-body').html(error.responseJSON.message)
                         $('#alertModal').modal('show');                        
                     }
                 });                 
@@ -624,7 +677,7 @@
 
                         // alert(chkCheked); - retorna o checkbox para o estado anterior
                         $('#'+chkObjeto).prop('checked', (chkCheked == 'SIM' ? false : true));
-                        $('#alertModal .modal-body').text(error.responseJSON.message)
+                        $('#alertModal .modal-body').html(error.responseJSON.message)
                         $('#alertModal').modal('show');                        
                     }
                 });                 
@@ -672,7 +725,7 @@
                             } else {
                                 $('#msgOperacaoExcluir').text(error.responseJSON.message).show();
 
-                                $('#alertModal .modal-body').text(error.responseJSON.message)
+                                $('#alertModal .modal-body').html(error.responseJSON.message)
                                 $('#alertModal').modal('show');
                             }
                         }
@@ -705,11 +758,6 @@
                         $('#formPerfilEditar #nome').val(data.nome);
                         $('#formPerfilEditar #descricao').val(data.descricao);
                         $('#formPerfilEditar #ativo').prop('checked', (data.ativo == "SIM" ? true : false));
-                        if(data.id == 1) {
-                            $('#btnPerfilSalvar').hide();
-                        } else {
-                            $('#btnPerfilSalvar').show();
-                        }
                     },
                     error: function (error) {
                         if (ERROR_HTTP_STATUS.has(error.status)) {
@@ -717,7 +765,7 @@
                             return;
                         } 
 
-                        $('#alertModal .modal-body').text(error.responseJSON.message)
+                        $('#alertModal .modal-body').html(error.responseJSON.message)
                         $('#alertModal').modal('show');
                     }
                 }); 

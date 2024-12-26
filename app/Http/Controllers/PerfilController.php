@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PerfilRequest;
+use Illuminate\Support\Facades\Gate;
 use App\Models\Autorizacao;
 use App\Models\Entidade;
 use Yajra\DataTables\Facades\DataTables;
@@ -60,14 +61,31 @@ class PerfilController extends Controller
 
         if(request()->ajax()) {
 
-            return DataTables::eloquent(Perfil::with('entidades'))
-            // return DataTables::eloquent(Perfil::select(['acl_perfils.*']))
-                ->filter(function ($query) { $query->where('id', '>=', "1");}, true)        
-                ->setRowId( function($param) { return $param->id; })
-                ->addColumn('entidades', function ($param) {return $this->getEntidades($param->id); })
-                ->rawColumns(['entidades'])
-                ->addIndexColumn()
-                ->make(true);        
+            // return DataTables::eloquent(Perfil::with('entidades'))
+            //     ->filter(function ($query) { $query->where('id', '>=', "1");}, true)        
+            //     ->setRowId( function($param) { return $param->id; })
+            //     ->addColumn('entidades', function ($param) {return $this->getEntidades($param->id); })
+            //     ->rawColumns(['entidades'])
+            //     ->addIndexColumn()
+            //     ->make(true);        
+
+                // $perfis = Perfil::where('id','>=', '1')->with('entidades')->get();    // Recupera os Usuários com a relação 'perfis', filtrando por id >= 1
+                $perfis = Perfil::where('id','>=', '1')->get();    
+
+                $autorizacoes = $this->getAbilities();  
+                // $entidades = $this->getEntidades();
+
+    
+                // Adicionar a coluna 'autorizacoes' na Collection a cada Perfil: function (User $autorizacoes) use ($autorizacao) 
+                $perfis->each(function ($perfil) use ($autorizacoes)  {             // Collection
+                    $perfil->setAttribute('autorizacoes', $autorizacoes);                               // adiciona a lista de todas Autorizações
+                    $perfil->setAttribute('entidades', $entidades = $this->getEntidades($perfil->id));  // adiciona a lista de todas Entidades
+                });          
+    
+                return [
+                    'data' => $perfis,
+                    'autorizacoes' => $autorizacoes,
+                ];
         }
         return view('acl/PerfilsDatatable');
     }
@@ -147,7 +165,6 @@ class PerfilController extends Controller
     {        
         // $perfil = Perfil::where('id',$request->id)->first();                // trás apenas o Perfil
         // $perfil = Perfil::with('autorizacoes')->find($request->id);         // trás o Perfil com todas autorizações relacionadas
-
         $perfil = Perfil::with('autorizacoes.rota')->find($request->id);    // recupera o Perfil com suas Autorizacoes e as Rotas associadas
         return Response()->json($perfil);
     }       
@@ -222,6 +239,26 @@ class PerfilController extends Controller
 
         return Response()->json(is_null($exception) ? ['id' => $request->id] : $exception);
     }
+
+    /**
+     * Retorna um array com todas as habilidades (ações/rotas autorizadas) do User logado as quais foram definidas com Gate::define()
+     */
+    protected function getAbilities()
+    {
+        $rotasAutorizadas = [];
+
+        // recupera um Collection de closures (Funcções Anônimas) nesse caso que espera um User como parâmetro: "user.index" => Closure(User $user)
+        foreach (Gate::abilities() as $ability => $callback) {
+            if (Gate::allows($ability)) {
+                $rotasAutorizadas[] = $ability;         // Adiciona a ability ao array se o usuário tiver permissão
+                if (stripos($ability, 'perfil') !== false) {
+                    $rotasAutorizadas[] = $ability;     // Adiciona a ability ao array se o usuário tiver permissão
+                }
+            }
+        }        
+
+        return $rotasAutorizadas;
+    }       
 
 
 }
