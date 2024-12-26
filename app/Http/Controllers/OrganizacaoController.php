@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests\OrganizacaoRequest;
-use App\Http\Resources\OrganizacaoResource;
-use App\Models\Autorizacao;
 use App\Models\Organizacao;
 use Illuminate\Support\Facades\Gate;
 
@@ -117,7 +115,6 @@ class OrganizacaoController extends Controller
     }   
 
     /**
-     * mover para um classe superior genérica
      * Retorna um array com todas as habilidades (ações/rotas autorizadas) do User logado as quais foram definidas com Gate::define()
      */
     protected function getAbilities()

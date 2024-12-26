@@ -22,13 +22,17 @@ class Perfil extends Model
         return $this->hasMany(Autorizacao::class);
     }       
 
-
-
-
-    // public function entidades() {
-    //     return $this->hasMany(Autorizacao::class,'acl_entidade_perfil');
-    //     // return $this->belongsToMany(Autorizacao::class,'acl_autorizacaos');
+    // Um perfil tem muitas autorizações
+    // public function autorizacoes() {
+    //     return $this->belongsToMany(Rota::class,'acl_autorizacaos');                                            // lista todas
+    //     // return $this->belongsToMany(Rota::class,'acl_autorizacaos')->where('acl_autorizacaos.ativo','=','SIM'); // lista apenas Autorizadas
     // }
+
+    // Um perfil tem muitas autorizações
+    public function autorizacoes() {
+        return $this->hasMany(Autorizacao::class);
+        // return $this->belongsToMany(Autorizacao::class,'acl_autorizacaos');
+    }
 
 
     // public function permissaos() {

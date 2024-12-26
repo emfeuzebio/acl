@@ -5,10 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Perfil;
 use App\Models\User;
 use Yajra\DataTables\Facades\DataTables;
-
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Response as HttpResponse;
 use App\Http\Requests\UserRequest;
 use Illuminate\Support\Facades\Hash;
 
@@ -23,14 +22,29 @@ class UserController extends Controller
 
         // dd('UserController->index()');
 
-        if(request()->ajax()) {
+        if (request()->ajax()) {
 
-            return DataTables::eloquent(User::with('perfis'))
-                ->filter(function ($query) { $query->where('id', '>=', "1");}, true)        
-                ->setRowId( function($param) { return $param->id; })
-                // ->rawColumns(['perfis'])
-                ->addIndexColumn()
-                ->make(true);
+            // Usar este quando usar o DataTables com serverSide: true. 
+            // return DataTables::eloquent(User::with('perfis'))
+            //     ->filter(function ($query) { $query->where('id', '>=', "1");}, true)
+            //     ->setRowId( function($param) { return $param->id; })
+            //     // ->rawColumns(['perfis'])
+            //     ->addIndexColumn()
+            //     ->make(true);
+
+            $users = User::where('id','>=', '1')->with('perfis')->get();    // Recupera os Usuários com a relação 'perfis', filtrando por id >= 1
+
+            $autorizacoes = $this->getAbilities();  
+
+            // Adicionar a coluna 'autorizacoes' na Collection a cada User: function (User $user) use ($autorizacao) 
+            $users->each(function ($user) use ($autorizacoes)  {  // Collection
+                $user->setAttribute('autorizacoes', $autorizacoes);
+            });          
+
+            return [
+                'data' => $users,
+                'autorizacoes' => $autorizacoes,
+            ];
         }
         return view('acl/UserDatatable');
     }    
@@ -97,7 +111,6 @@ class UserController extends Controller
             $result = DB::insert('INSERT INTO acl_perfil_user ( user_id, perfil_id) VALUES ( ?, ? )', [$User->id, 3]);
         }         
 
-        //AQUI inserir Perfil Padrão
         return Response()->json($User);
     }   
     
@@ -105,7 +118,28 @@ class UserController extends Controller
     {        
         $User = User::where(['id'=>$request->id])->delete();
         return Response()->json($User);
-    }      
+    }   
+
+    /**
+     * Retorna um array com todas as habilidades (ações/rotas autorizadas) do User logado as quais foram definidas com Gate::define()
+     */
+    protected function getAbilities()
+    {
+        $rotasAutorizadas = [];
+
+        // recupera um Collection de closures (Funcções Anônimas) nesse caso que espera um User como parâmetro: "user.index" => Closure(User $user)
+        foreach (Gate::abilities() as $ability => $callback) {
+            if (Gate::allows($ability)) {
+                $rotasAutorizadas[] = $ability;  // Adiciona a ability ao array se o usuário tiver permissão
+                // if (stripos($ability, 'organizacao') !== false) {
+                //     $rotasAutorizadas[] = $ability;  // Adiciona a ability ao array se o usuário tiver permissão
+                // }
+            }
+        }        
+
+        return $rotasAutorizadas;
+    }        
+
 
     
 }

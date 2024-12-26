@@ -31,11 +31,14 @@ class AutorizacaoController extends Controller
 
     public function authorizar(Request $request)
     {
-        $Autorizacao = Autorizacao::find($request->id);
-        $Autorizacao->ativo = $request->ativo;
-        $ret = $Autorizacao->save();
-        // dd($ret);
+        // Encontre a Autorizacao com base no perfil_id e rota_id
+        // $Autorizacao = Autorizacao::where('perfil_id', $request->perfil_id)->where('rota_id', $request->rota_id)->first();
         
+        // Encontre a Autorizacao com base no id 
+        $Autorizacao = Autorizacao::where('id', $request->autorizacao_id)->first();
+        $Autorizacao->ativo = $request->ativo;    
+        $Autorizacao->save();
+
         return Response()->json($Autorizacao);
     }
 

@@ -14,6 +14,13 @@
             </ol>
         </div>
     </div>
+
+    <style>
+        .dt-center {
+            text-align: center !important;
+        }       
+    </style>    
+
 @stop
 
 @section('content')
@@ -304,7 +311,7 @@
                         render: function (data) { 
                             return '<b>' + data + '</b>';}},
                     {"data": "descricao", "name": "acl_perfils.descricao", "class": "dt-left", "title": "Descrição", "width": "300px"},
-                    {"data": "entidades", "entidades": "", "orderable": false, "class": "dt-left", "title": "Entidades em que tês Autorizações", "width": "auto",
+                    {"data": "entidades", "entidades": "", "orderable": false, "class": "dt-left", "title": "Autorizações", "width": "auto",
                         render: function(data, type, row) {
                             return '<button class="btn btn-xs btn-success btnNovoEntidade" data-toggle="tooltip" title="Administrar Entidades concedidas a este Perfil">Administrar</button> ' + $.map(data, function(d, i) {
                                 return '<button id="' + d.id + '" class="btn btn-xs btn-' + ( d.id <= entidadePadrao ? 'default' : 'info btnEntidadeEditar' ) + '" data-toggle="tooltip" title="' + ( d.id <= entidadePadrao ? 'Entidade Padrão não pode ser editada.' : 'Administrar as Permissões concedidas à Entidade' ) + ' (' + d.model + ')">' + d.model + '</button> ';

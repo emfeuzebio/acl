@@ -145,7 +145,10 @@ class PerfilController extends Controller
 
     public function show(Request $request)
     {        
-        $perfil = Perfil::where('id',$request->id)->first();
+        // $perfil = Perfil::where('id',$request->id)->first();                // trás apenas o Perfil
+        // $perfil = Perfil::with('autorizacoes')->find($request->id);         // trás o Perfil com todas autorizações relacionadas
+
+        $perfil = Perfil::with('autorizacoes.rota')->find($request->id);    // recupera o Perfil com suas Autorizacoes e as Rotas associadas
         return Response()->json($perfil);
     }       
 

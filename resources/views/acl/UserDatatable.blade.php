@@ -13,6 +13,67 @@
             </ol>
         </div>
     </div>
+
+    <style>
+
+        .dt-center {
+            text-align: center !important;
+        }       
+
+        .switch-input:disabled {
+            background-color: #99c1d5 !important; /* A cor de fundo desejada */
+            cursor: not-allowed; /* O cursor é alterado para indicar que o input está desabilitado */        
+        }
+
+        /* Aumenta o z-index do segundo modal */
+        .modal.fade {
+        z-index: 1050; /* z-index padrão do Bootstrap 4 */
+        }
+
+        #modal2.modal.fade.show {
+        z-index: 1060; /* Maior z-index para garantir que o modal 2 sobreponha o modal 1 */
+        }        
+
+    </style>    
+
+<!-- Custom CSS para efeito de Hover nas guias -->
+<style>
+  .custom-tabs-hover .nav-item {
+    border: 1px solid #ddd;
+    border-radius: 5px 5px 0 0;
+    margin-right: 5px;
+  }
+
+  .custom-tabs-hover .nav-link {
+    border: none;
+    border-radius: 5px 5px 0 0;
+    padding: 10px 15px;
+    color: #007bff;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+  }
+
+  .custom-tabs-hover .nav-link.active {
+    color: #fff;
+    background-color: #007bff;
+    border: 1px solid #007bff;
+  }
+
+  .custom-tabs-hover .nav-link:hover {
+    background-color: #e9ecef;
+    border-color: #007bff;
+  }
+
+  .tab-content {
+    border: 1px solid #ddd;
+    border-radius: 0 0 5px 5px;
+    padding: 20px;
+    background-color: #f9f9f9;
+  }
+</style>
+
+
+
 @stop
 
 @section('content')
@@ -134,7 +195,6 @@
                             <fieldset class="border p-2">
                                 <legend class="w-auto h5">Perfis de Acesso</legend>
 
-                                <!-- <input type="text" id="user_id" value=""> -->
                                 <table id="tblPerfisConcedidos" class="table table-striped table-bordered table-hover table-sm compact" style="width:100%">
                                     <thead>
                                         <tr>
@@ -170,7 +230,6 @@
         </div>
     </div>
 
-
     <!-- modal excluir registro -->
     <div class="modal fade" id="confirmaExcluirModal" tabindex="-1" aria-hidden="true" data-backdrop="static">
         <div class="modal-dialog modal-sm">
@@ -205,8 +264,101 @@
                 </div>
             </div>
         </div>
-    </div>    
+    </div>  
+    
+    <!-- Modal -->
+    <div class="modal fade" id="modalPerfilVer" tabindex="-1" role="dialog" aria-labelledby="modalExemploLabel" aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Detalhes do Perfil de Acesso</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs custom-tabs-hover" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="perfil-tab" data-toggle="tab" href="#perfil" role="tab" aria-controls="perfil" aria-selected="true">Detalhes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="autorizacoes-tab" data-toggle="tab" href="#autorizacoes" role="tab" aria-controls="autorizacoes" aria-selected="false">Autorizações</a>
+                    </li>
+                    </ul>
+                    <!-- Tab panes -->
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade show active" id="perfil" role="tabpanel" aria-labelledby="perfil-tab">
 
+
+                            <form id="formPerfilEditar" name="formPerfilEditar" action="javascript:void(0)" class="form-horizontal" method="post">
+
+                                <div class="form-group input-group-sm" id="form-group-id">
+                                    <label class="form-label">ID</label>
+                                    <input class="form-control" value="" type="text" id="id" name="id" placeholder="" readonly data-toggle="tooltip" title="ID do Perfil de Acesso">
+                                </div>
+
+                                <div class="form-group input-group-sm">
+                                    <label class="form-label">Nome</label>
+                                    <input class="form-control" disabled value="" type="text" id="nome" name="nome" placeholder="" data-toggle="tooltip" title="Informe o Nome do Perfil de Acesso" >
+                                    <div id="error-nome" class="error invalid-feedback" style="display: none;"></div>
+                                </div>
+
+                                <div class="form-group input-group-sm">
+                                    <label class="form-label">Descrição</label>
+                                    <textarea class="form-control" disabled id="descricao" name="descricao" placeholder="" data-toggle="tooltip" title="Informe a Descrição do Perfil de Acesso" rows="4"></textarea>
+                                    <div id="error-descricao" class="error invalid-feedback" style="display: none;"></div>
+                                </div>
+
+                                <div class="form-group input-group-sm">
+                                    <label class="form-label" data-toggle="tooltip" title="Marcar se o Perfil de Acesso está Ativo">Ativo</label>
+                                    <label class="switch">
+                                        <input type="checkbox" disabled id="ativo" name="ativo" class="switch-input" data-toggle="tooltip" title="Marcar se  o Perfil de Acesso está Ativo">
+                                        <span class="switch-label" data-on="SIM" data-off="NÃO"></span>
+                                        <span class="switch-handle"></span>
+                                    </label>
+                                    <div id="error-ativo" class="error invalid-feedback" style="display: none;"></div>
+                                </div>
+
+                            </form>
+                        
+                    </div>  
+                    <div class="tab-pane fade" id="autorizacoes" role="tabpanel" aria-labelledby="autorizacoes-tab">
+                        
+                            <fieldset class="border p-2">
+                                <legend class="w-auto h5">Ações Autorizadas</legend>
+
+                                <input type="hidden" id="perfil_id" value="">
+                                <table id="tblAutorizacoes" class="table table-striped table-bordered table-hover table-sm compact" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Ação</th>
+                                            <th>Rota</th>
+                                            <th>Autorizada</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="bodyAutorizacoes">
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot></tfoot>                
+                                </table> 
+                            </fieldset>
+
+                    </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script type="text/javascript">
 
@@ -216,10 +368,11 @@
 
             let id = '';
             let perfil_id = '';
+            var autorizacoes = '';
 
             $.ajaxSetup({
-                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-                statusCode: { 401: function() { window.location.href = "/login"; } }
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },  // valida o X-CSRF-TOKEN
+                statusCode: { 401: function() { window.location.href = "/login";} },        // 401-UNAUTHORIZED redireciona para login
             });
 
             /*
@@ -227,13 +380,28 @@
             */
             $('#datatables-users').DataTable({
                 processing: true,
-                serverSide: true,
+                // serverSide: true,
                 responsive: true,
                 autoWidth: true,
                 // order: [ 1, 'asc' ],
                 lengthMenu: [[5, 10, 15, 30, 50, -1], [5, 10, 15, 30, 50, "Todos"]], 
                 pageLength: 10,
-                ajax: "{{url("user")}}",
+                ajax: {
+                    type: "GET",
+                    url: "{{url("user")}}",                             // rota
+                    dataSrc: function (json) {
+                        let autorizacoes = json.autorizacoes;           // Rotas autorizadas
+                        // console.log(autorizacoes);                   // Rotas autorizadas
+
+                        // controle do botão Inserir Novo
+                        if (json.autorizacoes.includes('user.store')) { $("#btnInserirNovo").show(); } else { $("#btnInserirNovo").hide(); }
+
+                        // controle do botão Salvar do Modal de Edição
+                        if (json.autorizacoes.includes('user.update')) { $("#btnUserSalvar").show(); } else { $("#btnUserSalvar").hide(); }
+
+                        return json.data;                           // Retorna lista de dados para o DataTables
+                    },                    
+                },
                 // language: { url: "{{ asset('vendor/datatables/DataTables.pt_BR.json') }}" },
                 columns: [
                     {"data": "id", "name": "users.id", "class": "dt-right", "title": "#", "width": "30px"},
@@ -241,10 +409,25 @@
                         render: function (data) { return '<b>' + data + '</b>';}},
                     {"data": "email", "name": "users.email", "class": "dt-left", "title": "E-Mail", "width": "auto"},
                     {"data": "perfis", "name": "users.perfis", "searchable":false, "orderable": false, "class": "dt-left", "title": "Perfis de Acesso", "width": "auto",
-                        render: function(data, type, row) {
-                            return '<button class="btn btn-xs btn-success btnConcederPerfil" data-toggle="tooltip" title="Conceder Perfis de Acesso ao Usuário">Conceder</button> ' + $.map(data, function(d, i) {
-                                return '<button id="' + d.id + '" class="btn btn-xs btn-' + ( d.id <= 1 ? 'default' : 'info btnUserEditar' ) + '" data-toggle="tooltip" title="' + ( d.id <= 1 ? 'Entidade Padrão não pode ser editada.' : 'Administrar as Permissões concedidas à Entidade' ) + ' (' + d.nome + ')">' + d.nome + '</button> ';
-                            }).join(' ');
+                        render: function(data, type, row, json) {
+
+                            var btnConcederPerfil = '';
+                            var listarPerfis = '';
+
+                            // controle botão btnConcederPerfil
+                            if (row.autorizacoes.includes('user.concederPerfil')) {
+                                btnConcederPerfil = '<button class="btn btn-xs btn-success btnConcederPerfil" data-toggle="tooltip" title="Conceder Perfis de Acesso ao Usuário">Conceder</button> ';
+                            }                            
+
+                            // controla a lista listarPerfis
+                            if (row.autorizacoes.includes('user.listarPerfis')) {
+                                listarPerfis = $.map(data, function(d, i) {
+                                    return '<button id="' + d.id + '" class="btn btn-xs btn-' + ( d.id <= 1 ? 'default' : 'info btnPerfilVer' ) + '" data-perfil_id="' + d.id + '" data-toggle="tooltip" title="' + ( d.id <= 1 ? 'Entidade Padrão não pode ser editada.' : 'Administrar as Permissões concedidas à Entidade' ) + ' (' + d.nome + ')">' + d.nome + '</button> ';
+                                }).join(' ');
+                            }
+                            
+                            return btnConcederPerfil + listarPerfis;
+                            
                     }},
                     // {"data": "created_at", "name": "users.created_at", "class": "dt-center", "title": "Criado em", "width": "130px",
                     //     render: function (data) { return new Date(data).toLocaleString('pt-BR'); }
@@ -254,12 +437,33 @@
                     },
                     {"data": "id", "botoes": "", "orderable": false, "class": "dt-center", "title": "Ações", "width": "80px", 
                         render: function (data, type, row) { 
+
+                            btnEditar = '';                 // esconde botoes
+                            btnExcluir = '';                // esconde botoes
+
+                            // controle botão Ver
+                            if (row.autorizacoes.includes('user.show')) {
+                                btnEditar = '<button type="button" class="btnUserEditar btn btn-primary btn-xs" data-operacao="ver" data-toggle="tooltip" title="Ver o registro atual">Ver</button> ';
+                            }
+
+                            // // controle botão Editar
+                            if (row.autorizacoes.includes('user.update')) {
+                                btnEditar = '<button type="button" class="btnUserEditar btn btn-primary btn-xs" data-operacao="salvar" data-toggle="tooltip" title="Editar o registro atual">Editar</button> ';
+                            }
+
+                            // // controle botão Excluir
+                            if (row.autorizacoes.includes('user.destroy')) {
+                                btnExcluir = '<button type="button" class="btnUserExcluir btn btn-danger btn-xs" data-operacao="excluir" data-toggle="tooltip" title="Excluir o registro atual">Excluir</button> ';
+                            }
+
+                            return btnEditar + btnExcluir; 
+
                             // As Estidades Básica (id=[1-5]) não podem ser excluídas
-                            return ( row.id > 1 ? '<button class="btnUserEditar btn btn-primary btn-xs" data-toggle="tooltip" title="Editar o registro atual">Editar</button> ' : 
-                                                  '<button class="btnUserEditar btn btn-default btn-xs" data-toggle="tooltip" title="Ver o registro atual">Ver</button>' )  + 
-                                   ( row.id > 1 ? '<button class="btnUserExcluir btn btn-danger btn-xs" data-toggle="tooltip" title="Excluir o registro atual">Excluir</button> ' : ' ' ) +
-                                   ''; 
-                                //    '<button class="btnRotas btn btn-info btn-xs" data-toggle="tooltip" title="Editar as Rotas da Entidade atual">Perfis</button> '; 
+                            // return ( row.id > 1 ? '<button class="btnUserEditar btn btn-primary btn-xs" data-toggle="tooltip" title="Editar o registro atual">Editar</button> ' : 
+                            //                       '<button class="btnUserEditar btn btn-default btn-xs" data-toggle="tooltip" title="Ver o registro atual">Ver</button>' )  + 
+                            //        ( row.id > 1 ? '<button class="btnUserExcluir btn btn-danger btn-xs" data-toggle="tooltip" title="Excluir o registro atual">Excluir</button> ' : ' ' ) +
+                            //        ''; 
+                            //    '<button class="btnRotas btn btn-info btn-xs" data-toggle="tooltip" title="Editar as Rotas da Entidade atual">Perfis</button> '; 
                         }
                     },
                 ]
@@ -268,6 +472,102 @@
             /*
             * Editar o Usuário
             */
+            $("#datatables-users tbody").delegate('tr td .btnPerfilVer', 'click', function (e) {
+                e.stopImmediatePropagation();           
+                
+                var perfil_id = $(this).data("perfil_id");
+
+                $.ajax({
+                    type: "GET",
+                    url: "{{url("perfil/show")}}",
+                    data: { "id": perfil_id},
+                    dataType: 'json',
+                    success: function (response) {
+
+                        // monta guia detalhes do Perfil
+                        $('#modalPerfilVer #modalLabel').html('Ver o Perfil de Acesso');
+                        $('#modalPerfilVer #id').val(response.id);
+                        $('#modalPerfilVer #nome').val(response.nome);
+                        $('#modalPerfilVer #descricao').val(response.descricao);
+                        $('#modalPerfilVer #ativo').prop('checked', (response.ativo == "SIM" ? true : false));
+
+                        $('#tblAutorizacoes').DataTable().destroy();  // Destrói a instância existente
+                        $('#minhaTabela tbody').empty();
+
+                        // monta guia tabela de autorizações
+                        tblAutorizacoesLinhas = '';
+                        $.each(response.autorizacoes, function(i, obj){
+                            tblAutorizacoesLinhas += '' + 
+                            '<tr id="tr' + obj.id + '">' + 
+                                '<td>' + (i+1) + '</td>' + 
+                                '<td>' + obj.rota.descricao + '</td>' + 
+                                '<td>' + obj.rota.rota + '</td>' + 
+                                '<td class="text-center">' + 
+                                    '<label class="switch">' + 
+                                    // '<input type="checkbox" id="' + obj.id + '" data-perfil_id="' + perfil_id + '" data-rota_id="' + obj.id + '" ' + ( obj.ativo == 'SIM' ? 'checked' : '' ) + '  class="switch-input" data-toggle="tooltip" title="Incluir">' + 
+                                    '<input type="checkbox" id="' + obj.id + '" data-autorizacao_id="' + obj.id + '" ' + ( obj.ativo == 'SIM' ? 'checked' : '' ) + '  class="switch-input" data-toggle="tooltip" title="Incluir">' + 
+                                    '<span class="switch-label" data-on="SIM" data-off="NÃO"></span>' + 
+                                    '<span class="switch-handle"></span>' + 
+                                    '</label>' + 
+                                '</td>' + 
+                            '</tr>';
+                        })
+                        tblAutorizacoesLinhas = tblAutorizacoesLinhas ? tblAutorizacoesLinhas : '<tr><td class="text-center" colspan="4">Nenhuma Autorização encontrada</td></tr>';
+                        $('#bodyAutorizacoes').empty().append(tblAutorizacoesLinhas);    // adiciona as linhas na tabela   
+
+                        // Renderiza o DataTable com os dados populados
+                        $('#tblAutorizacoes').DataTable({
+                            lengthMenu: [[5, 10, 15, 30, 50, -1], [5, 10, 15, 30, 50, "Todos"]], 
+                            pageLength: 5,
+                            autoWidth: true,
+                        });
+                        $('#modalPerfilVer').modal('show');                             // show modal  
+                    },
+                    error: function (error) {
+                        if (ERROR_HTTP_STATUS.has(error.status)) { window.location.href = "{{ url('/login') }}"; return; } 
+                        $('#alertModal .modal-body').text(error.responseJSON.message)
+                        $('#alertModal').modal('show');
+                    }
+                }); 
+            });
+
+
+            /**
+             * ações ao clicar sobre os checkbox e mudar seu estado: tr td :checkbox
+             */
+            $("#tblAutorizacoes tbody").delegate('tr td :checkbox', 'click', function (e) {
+                e.stopImmediatePropagation();                 
+
+                var chkObjeto = $(this).attr("id");
+                var autorizacao_id = $(this).data("autorizacao_id");
+                var ativo     = $(this).is(":checked") ? "SIM" : "NÃO";
+
+                $.ajax({
+                    type: "POST",
+                    url: "{{url("autorizacao/authorizar")}}",
+                    data: { "autorizacao_id":autorizacao_id, "ativo":ativo },
+                    // data: { "perfil_id":perfil_id, "rota_id":rota_id, "ativo":ativo },
+                    dataType: 'json',
+                    success: function (data) {
+                        // nesse caso sucesso não precisa exibir confirmação por ser um switchbox
+                        // console.log(data)
+                    },
+                    error: function (error) {
+                        // alert('error');
+                        if (ERROR_HTTP_STATUS.has(error.status)) {
+                            window.location.href = "{{ url('/login') }}";
+                            return;
+                        } 
+
+                        // retorna o checkbox para o estado anterior
+                        $('#'+chkObjeto).prop('checked', (ativo == 'SIM' ? false : true));               
+                        $('#alertModal .modal-body').text(error.responseJSON.message)
+                        $('#alertModal').modal('show');   
+                    }
+                });                 
+               
+            });               
+
             $("#datatables-users tbody").delegate('tr td .btnUserEditar', 'click', function (e) {
                 e.stopImmediatePropagation();            
 
@@ -291,11 +591,11 @@
                         $('#formUserEditar #id').val(data.id);
                         $('#formUserEditar #name').val(data.name);
                         $('#formUserEditar #email').val(data.email);
-                        if(data.id == 1) {
-                            $('#btnUserSalvar').hide();
-                        } else {
-                            $('#btnUserSalvar').show();
-                        }
+                        // if(data.id == 1) {
+                        //     $('#btnUserSalvar').hide();
+                        // } else {
+                        //     $('#btnUserSalvar').show();
+                        // }
                     },
                     error: function (error) {
                         if (ERROR_HTTP_STATUS.has(error.status)) {
@@ -553,3 +853,16 @@
     </script>    
 
 @stop
+
+<style>
+
+    /* Aumenta o z-index do segundo modal */
+    .modal.fade {
+    z-index: 1050; /* z-index padrão do Bootstrap 4 */
+    }
+
+    #alertModal.modal.fade.show {
+    z-index: 1060; /* Maior z-index para garantir que o modal 2 sobreponha o modal 1 */
+    }        
+
+</style>    
