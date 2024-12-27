@@ -314,7 +314,6 @@
                         // controle do botão Salvar do Modal de Edição
                         if (json.autorizacoes.includes('perfil.update')) { $("#btnPerfilSalvar").show(); } else { $("#btnPerfilSalvar").hide(); }
                         
-
                         return json.data;                           // Retorna lista de dados para o DataTables
                     },                    
                 },                
@@ -363,7 +362,7 @@
                                 btnEditar = '<button class="btnPerfilEditar btn btn-primary btn-xs" data-operacao="ver" data-toggle="tooltip" title="Ver o registro atual">Ver</button> ';
                             }
 
-                            // // controle botão Editar
+                            // controle botão Editar
                             if (row.autorizacoes.includes('perfil.update')) {
                                 btnEditar = '<button class="btnPerfilEditar btn btn-primary btn-xs" data-operacao="salvar" data-toggle="tooltip" title="Editar o registro atual">Editar</button> ';
                             }

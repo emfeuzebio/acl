@@ -13,6 +13,13 @@
             </ol>
         </div>
     </div>
+
+    <style>
+        .dt-center {
+            text-align: center !important;
+        }       
+    </style>    
+
 @stop
 
 @section('content')
@@ -24,7 +31,7 @@
                 <div class="card-header">
                     <div class="row">
                         <!--área de título da Entidade-->
-                        <div class="col-md-5 text-left h5"><b>Administração de Entidades e Rotas</b></div>
+                        <div class="col-md-5 text-left h5"><b>Administração de Entidades e Ações</b></div>
                         <!--área de mensagens-->
                         <div class="col-md-4 text-left">
                             <div style="padding: 0px;  background-color: transparent;">
@@ -160,7 +167,7 @@
                         </fieldset>                        
 
                         <fieldset class="border p-2">
-                            <legend class="w-auto h5">Inserir Nova Rota</legend>
+                            <legend class="w-auto h5">Inserir Nova Ação (Rota)</legend>
                             <form id="formRota" name="formRota" action="javascript:void(0)" class="form-horizontal" method="post">
 
                                 <div class="form-group input-group-sm">
@@ -290,14 +297,30 @@
             * Cria a datatables da Entidade
             */
             $('#datatables-entidades').DataTable({
+                // serverSide: true,
                 processing: true,
-                serverSide: true,
                 responsive: true,
                 autoWidth: true,
                 // order: [ 1, 'asc' ],
                 lengthMenu: [[5, 10, 15, 30, 50, -1], [5, 10, 15, 30, 50, "Todos"]], 
                 pageLength: 10,
-                ajax: "{{url("entidade")}}",
+                // ajax: "{{url("entidade")}}",
+                ajax: {
+                    type: "GET",
+                    url: "{{url("entidade")}}",                             // rota
+                    dataSrc: function (json) {
+                        let autorizacoes = json.autorizacoes;           // Rotas autorizadas
+
+                        // controle do botão Inserir Novo
+                        if (json.autorizacoes.includes('entidade.store')) { $("#btnEntidadeNovo").show(); } else { $("#btnEntidadeNovo").hide(); }
+
+                        // controle do botão Salvar do Modal de Edição
+                        if (json.autorizacoes.includes('entidade.update')) { $("#btnEntidadeSalvar").show(); } else { $("#btnEntidadeSalvar").hide(); }
+
+                        return json.data;                               // Retorna lista de dados para o DataTables
+                    },                    
+                },                
+                rowId: 'id',                
                 // language: { url: "{{ asset('vendor/datatables/DataTables.pt_BR.json') }}" },
                 columns: [
                     {"data": "id", "name": "acl_entidades.id", "class": "dt-right", "title": "#", "width": "30px"},
@@ -309,12 +332,32 @@
                         render: function (data) { return '<span class="' + ( data == 'SIM' ? 'text-primary' : 'text-danger') + '">' + data + '</span>';}
                     },                    
                     {"data": "id", "botoes": "", "orderable": false, "class": "dt-center", "title": "Ações", "width": "80px", 
-                        render: function (data, type, row) { 
-                            // As Estidades Básica (id=[1-5]) não podem ser excluídas
-                            return ( row.id > 9 ? '<button class="btnEntidadeEditar btn btn-primary btn-xs" data-toggle="tooltip" title="Editar o registro atual">Editar</button> ' : 
-                                                  '<button class="btnEntidadeEditar btn btn-primary btn-xs" data-toggle="tooltip" title="Ver o registro atual">Ver</button>' )  + 
-                                   ( row.id > 9 ? '<button class="btnEntidadeExcluir btn btn-danger btn-xs" data-toggle="tooltip" title="Excluir o registro atual">Excluir</button> ' : ' ' ) +
-                                   '<button class="btnRotas btn btn-info btn-xs" data-toggle="tooltip" title="Editar as Rotas da Entidade atual">Rotas</button> '; 
+                        render: function(data, type, row) {
+
+                            btnEditar = '';                 // esconde botoes
+                            btnExcluir = '';                // esconde botoes
+                            btnRotas = '';                // esconde botoes
+
+                            // controle botão Ver
+                            if (row.autorizacoes.includes('entidade.show')) {
+                                btnEditar = '<button class="btnEntidadeEditar btn btn-primary btn-xs" data-toggle="tooltip" title="Ver o registro atual">Ver</button> ';
+                            }
+
+                            // controle botão Editar - As Estidades Básica (id=[1-9]) não podem ser alteradas
+                            if (row.id > 9 && row.autorizacoes.includes('entidade.update')) {
+                                btnEditar = '<button class="btnEntidadeEditar btn btn-primary btn-xs" data-toggle="tooltip" title="Editar o registro atual">Editar</button> ';                            
+                            }
+
+                            // controle botão Excluir - As Estidades Básica (id=[1-9]) não podem ser excluídas
+                            if (row.id > 9 && row.autorizacoes.includes('entidade.destroy')) {
+                                btnExcluir = '<button class="btnEntidadeExcluir btn btn-danger btn-xs" data-toggle="tooltip" title="Excluir o registro atual">Excluir</button> ';
+                            }
+
+                            if (row.autorizacoes.includes('entidade.rotas')) {
+                                btnRotas = '<button class="btnRotas btn btn-info btn-xs" data-toggle="tooltip" title="Editar as Ações da Entidade atual">Ações</button> ';
+                            }
+
+                            return btnEditar + btnExcluir + btnRotas;
                         }
                     },
                 ]

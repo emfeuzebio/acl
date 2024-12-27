@@ -753,9 +753,10 @@
                             tblPerfis += '' + 
                             '<tr id="' + obj.id + '">' + 
                                 '<td>' + (i+1) + '</td>' + 
-                                // '<td>' + obj.id + ' ' + obj.nome + '</td>' + 
-                                '<td>' + obj.nome + '</td>' + 
-                                '<td class="text-center">' + ( id > 1 ? // Usuário 1-Admin sempre têm todos Perfis de Acesso
+                                '<td>' + obj.id + ' ' + obj.nome + '</td>' + 
+                                // '<td>' + obj.nome + '</td>' + 
+                                // '<td class="text-center">' + ( id > 1 ? // Usuário 1-Admin sempre têm todos Perfis de Acesso
+                                '<td class="text-center">' + ( id >= 1 ? // Usuário 1-Admin sempre têm todos Perfis de Acesso
                                     '<label class="switch">' + 
                                     '<input type="checkbox" id="chk' + obj.id + '" ' + obj.concedido + ' data-user_id="' + id + '" data-perfil_id="' + obj.id + '" class="switch-input" data-toggle="tooltip" title="Incluir">' + 
                                     '<span class="switch-label" data-on="SIM" data-off="NÃO"></span>' + 

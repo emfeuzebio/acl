@@ -322,35 +322,12 @@ return [
         [
             'text' => 'Perfis de Acesso',
             'url' => 'perfil',
-            'icon' => 'fas fa-fw fa-user',
+            'icon' => 'fas fa-fw fa-lock',
         ],
         [
             'text' => 'Entidades e Rotas',
             'url' => 'entidade',
-            'icon' => 'fas fa-fw fa-user',
-        ],
-        // [
-        //     'text' => 'Sistemas',
-        //     'url' => 'sistema',
-        //     'icon' => 'fas fa-fw fa-user',
-        //     // 'text' => 'profile',
-        //     // 'url' => 'admin/settings',
-        // ],
-        [
-            'text' => 'Organizações PADRÃO',
-            'url' => 'organizacao',
-            'icon' => 'fas fa-fw fa-user',
-            // 'text' => 'profile',
-            // 'url' => 'admin/settings',
-        ],
-        // Separador
-        ['header' => '-----------'],        
-        [
-            'text' => 'Organizações APIEVENTOS',
-            'url' => 'organizacao',
-            'icon' => 'fas fa-fw fa-user',
-            // 'text' => 'profile',
-            // 'url' => 'admin/settings',
+            'icon' => 'fas fa-fw fa-database',
         ],
         // [
         //     'text' => 'change_password',

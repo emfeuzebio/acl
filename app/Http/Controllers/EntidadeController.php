@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\EntidadeRequest;
 use Illuminate\Http\Response as HttpResponse;
+use Illuminate\Support\Facades\Gate;
 use App\Models\Entidade;
 use App\Models\Rota;
 use Exception;
@@ -20,13 +21,29 @@ class EntidadeController extends Controller
         if(request()->ajax()) {
 
             // return DataTables::eloquent(Entidade::with('entidades'))
-            return DataTables::eloquent(Entidade::with('rotas'))
-                ->filter(function ($query) { $query->where('id', '>=', "1");}, true)        
-                ->setRowId( function($param) { return $param->id; })
-                // ->addColumn('entidades', function ($param) {return $this->getEntidades($param->id); })
-                ->rawColumns(['entidades'])
-                ->addIndexColumn()
-                ->make(true);        
+            // return DataTables::eloquent(Entidade::with('rotas'))
+            //     ->filter(function ($query) { $query->where('id', '>=', "1");}, true)        
+            //     ->setRowId( function($param) { return $param->id; })
+            //     // ->addColumn('entidades', function ($param) {return $this->getEntidades($param->id); })
+            //     ->rawColumns(['entidades'])
+            //     ->addIndexColumn()
+            //     ->make(true);
+
+                // $perfis = Perfil::where('id','>=', '1')->with('entidades')->get();    // Recupera os Usuários com a relação 'perfis', filtrando por id >= 1
+                $perfis = Entidade::where('id','>=', '1')->get();    
+
+                $autorizacoes = $this->getAbilities();  
+    
+                // Adicionar a coluna 'autorizacoes' na Collection a cada Perfil: function (User $autorizacoes) use ($autorizacao) 
+                $perfis->each(function ($perfil) use ($autorizacoes)  {             // Collection
+                    $perfil->setAttribute('autorizacoes', $autorizacoes);                               // adiciona a lista de todas Autorizações
+                    $perfil->setAttribute('entidades', $entidades = $this->getEntidades($perfil->id));  // adiciona a lista de todas Entidades
+                });          
+    
+                return [
+                    'data' => $perfis,
+                    'autorizacoes' => $autorizacoes,
+                ];
         }
         return view('acl/EntidadeDatatable');
     }
@@ -97,7 +114,6 @@ class EntidadeController extends Controller
         return Response()->json(is_null($exception) ? ['id' => $request->id] : $exception);
     }        
 
-
     public function destroy(Request $request)
     {       
         // As Estidades Básica (id=[1-5]) não podem ser editadas ou excluídas 
@@ -129,7 +145,6 @@ class EntidadeController extends Controller
         // $Entidade = Entidade::where('id',$request->id)->delete();
         return Response()->json($Entidade);
     }          
-
 
     public function list(Request $request)
     {        
@@ -190,7 +205,6 @@ class EntidadeController extends Controller
         // $Entidades = DB::select($sql,[$request->id]);
     }    
 
-
     public function show(Request $request)
     {        
 
@@ -209,20 +223,45 @@ class EntidadeController extends Controller
         $Entidade['autorizacoes'] = $Autorizacoes;
 
         return Response()->json($Entidade);
-    }    
+    }   
     
-    // protected function getEntidades($perfil_id) {
+    protected function getEntidades($perfil_id)
+    {
+        // $entidades = Entidade::where('id',$perfil_id)->get();
+        $sql = "
+            SELECT DISTINCT 
+                  acl_autorizacaos.entidade_id AS id
+                , acl_entidades.model
+                , acl_entidades.id
+            FROM acl_autorizacaos
+                INNER JOIN acl_entidades ON acl_entidades.id = acl_autorizacaos.entidade_id
+            WHERE perfil_id = ?
+            ORDER BY acl_entidades.id ASC
+        ";        
+        $entidades = DB::select($sql,[$perfil_id]);
+        
+        return $entidades;
+    }
 
-    //     $entidades = Entidade::where('id',$perfil_id)->get();
+    /**
+     * Retorna um array com todas as habilidades (ações/rotas autorizadas) do User logado as quais foram definidas com Gate::define()
+     */
+    protected function getAbilities()
+    {
+        $rotasAutorizadas = [];
 
-    //     $entidadesLabels  = '';
-    //     foreach($entidades as $entidade) {
-    //         $entidadesLabels .= '<button class="btn btn-success btn-xs btnPerfil" data-perfil-id="' . $entidade->id . '" data-toggle="tooltip" title="Ver os detalhes deste Perfil de Acesso">' . $entidade->id . ' ' . $entidade->nome . '</button> ';
-    //     }
+        // recupera um Collection de closures (Funcções Anônimas) nesse caso que espera um User como parâmetro: "user.index" => Closure(User $user)
+        foreach (Gate::abilities() as $ability => $callback) {
+            if (Gate::allows($ability)) {
+                $rotasAutorizadas[] = $ability;         // Adiciona a ability ao array se o usuário tiver permissão
+                if (stripos($ability, 'perfil') !== false) {
+                    $rotasAutorizadas[] = $ability;     // Adiciona a ability ao array se o usuário tiver permissão
+                }
+            }
+        }        
 
-    //     return $entidadesLabels;
-    // }
-    
+        return $rotasAutorizadas;
+    }           
 }
 
 

@@ -73,8 +73,6 @@ class PerfilController extends Controller
                 $perfis = Perfil::where('id','>=', '1')->get();    
 
                 $autorizacoes = $this->getAbilities();  
-                // $entidades = $this->getEntidades();
-
     
                 // Adicionar a coluna 'autorizacoes' na Collection a cada Perfil: function (User $autorizacoes) use ($autorizacao) 
                 $perfis->each(function ($perfil) use ($autorizacoes)  {             // Collection
@@ -89,7 +87,6 @@ class PerfilController extends Controller
         }
         return view('acl/PerfilsDatatable');
     }
-
 
     protected function getEntidades($perfil_id) {
 
@@ -259,7 +256,6 @@ class PerfilController extends Controller
 
         return $rotasAutorizadas;
     }       
-
 
 }
 
