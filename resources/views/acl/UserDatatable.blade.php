@@ -1,5 +1,7 @@
 @extends('adminlte::page')
 
+@section('title', 'ACL Usuários')
+
 @section('content_header')
     <div class="row mb-2">
         <div class="m-0 text-dark col-sm-6">

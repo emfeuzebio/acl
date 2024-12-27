@@ -1,5 +1,7 @@
 @extends('adminlte::page')
 
+@section('title', 'ACL Entidades e Rotas')
+
 @section('content_header')
     <div class="row mb-2">
         <div class="m-0 text-dark col-sm-6">
@@ -9,7 +11,7 @@
             <ol class="breadcrumb float-sm-right">
                 <li class="breadcrumb-item"><a href="/home">Home</a></li>
                 <li class="breadcrumb-item ">Administração</li>
-                <li class="breadcrumb-item active">Entidades</li>
+                <li class="breadcrumb-item active">Entidades e Rotas</li>
             </ol>
         </div>
     </div>
