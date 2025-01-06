@@ -1,4 +1,4 @@
-@extends('adminlte::page')
+@extends('adminlte::page')swtch
 
 @section('title', 'ACL Usuários')
 
@@ -22,10 +22,11 @@
             text-align: center !important;
         }       
 
-        .switch-input:disabled {
-            background-color: #99c1d5 !important; /* A cor de fundo desejada */
-            cursor: not-allowed; /* O cursor é alterado para indicar que o input está desabilitado */        
-        }
+        /* .switch-input:disabled {
+            background-color: #99c1d5 !important;
+            cursor: not-allowed; 
+        } 
+        */
 
         /* Aumenta o z-index do segundo modal */
         .modal.fade {
@@ -160,6 +161,16 @@
                                     <label class="form-label">Confirmação da Senha</label>
                                     <input class="form-control" value="" type="password" id="password_confirmation" name="password_confirmation" placeholder="!@#Senha10" data-toggle="tooltip" title="Informe a Senha do Usuário" >
                                     <div id="error-password_confirmation" class="error invalid-feedback" style="display: none;"></div>
+                                </div>
+
+                                <div class="form-group input-group-sm">
+                                    <label class="form-label" data-toggle="tooltip" title="Marcar se o Usuário está Ativo">Ativo</label>
+                                    <label class="switch">
+                                        <input type="checkbox" id="ativo" name="ativo" class="switch-input" data-toggle="tooltip" title="Marcar se o Usuário está Ativo">
+                                        <span class="switch-label" data-on="SIM" data-off="NÃO"></span>
+                                        <span class="switch-handle"></span>
+                                    </label>
+                                    <div id="error-ativo" class="error invalid-feedback" style="display: none;"></div>
                                 </div>
 
                             </form>
@@ -435,6 +446,7 @@
                     // {"data": "created_at", "name": "users.created_at", "class": "dt-center", "title": "Criado em", "width": "130px",
                     //     render: function (data) { return new Date(data).toLocaleString('pt-BR'); }
                     // },
+                    {"data": "ativo", "name": "users.ativo", "class": "dt-center", "title": "Ativo", "width": "30px"},
                     {"data": "updated_at", "name": "users.updated_at", "title": "Atualizado em", "width": "130px", 
                         render: function (data) { return new Date(data).toLocaleString([], {day: "2-digit",month: "2-digit",year: "numeric",hour: "2-digit",minute: "2-digit"}); }
                     },
@@ -593,6 +605,9 @@
                         $('#formUserEditar #id').val(data.id);
                         $('#formUserEditar #name').val(data.name);
                         $('#formUserEditar #email').val(data.email);
+                        $('#formUserEditar #email').val(data.email);
+                        $('#formUserEditar #ativo').prop('checked', (data.ativo == "SIM" ? true : false));
+
                         // if(data.id == 1) {
                         //     $('#btnUserSalvar').hide();
                         // } else {

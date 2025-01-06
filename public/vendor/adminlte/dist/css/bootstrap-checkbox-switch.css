@@ -239,3 +239,9 @@ table {
 .switch-green > .switch-input:checked ~ .switch-label {
   background: #4fb845;
 }
+
+/* EUZ */
+.switch-input:disabled {
+  opacity: 0.5; /* Torna o checkbox mais transparente */
+  cursor: not-allowed; /* Altera o cursor para indicar que não pode ser interagido */
+}

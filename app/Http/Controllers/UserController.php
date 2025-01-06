@@ -103,6 +103,7 @@ class UserController extends Controller
                 'name' => trim($request->name),
                 'email' => trim($request->email),
                 'password' => Hash::make($request->password),
+                'ativo' => $request->ativo,
             ]
         );  
 
