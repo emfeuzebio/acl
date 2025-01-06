@@ -1,4 +1,4 @@
-@extends('adminlte::page')swtch
+@extends('layouts.app')
 
 @section('title', 'ACL Usuários')
 
@@ -39,47 +39,45 @@
 
     </style>    
 
-<!-- Custom CSS para efeito de Hover nas guias -->
-<style>
-  .custom-tabs-hover .nav-item {
-    border: 1px solid #ddd;
-    border-radius: 5px 5px 0 0;
-    margin-right: 5px;
-  }
+    <!-- Custom CSS para efeito de Hover nas guias -->
+    <style>
+    .custom-tabs-hover .nav-item {
+        border: 1px solid #ddd;
+        border-radius: 5px 5px 0 0;
+        margin-right: 5px;
+    }
 
-  .custom-tabs-hover .nav-link {
-    border: none;
-    border-radius: 5px 5px 0 0;
-    padding: 10px 15px;
-    color: #007bff;
-    background-color: #f8f9fa;
-    transition: all 0.3s ease;
-  }
+    .custom-tabs-hover .nav-link {
+        border: none;
+        border-radius: 5px 5px 0 0;
+        padding: 10px 15px;
+        color: #007bff;
+        background-color: #f8f9fa;
+        transition: all 0.3s ease;
+    }
 
-  .custom-tabs-hover .nav-link.active {
-    color: #fff;
-    background-color: #007bff;
-    border: 1px solid #007bff;
-  }
+    .custom-tabs-hover .nav-link.active {
+        color: #fff;
+        background-color: #007bff;
+        border: 1px solid #007bff;
+    }
 
-  .custom-tabs-hover .nav-link:hover {
-    background-color: #e9ecef;
-    border-color: #007bff;
-  }
+    .custom-tabs-hover .nav-link:hover {
+        background-color: #e9ecef;
+        border-color: #007bff;
+    }
 
-  .tab-content {
-    border: 1px solid #ddd;
-    border-radius: 0 0 5px 5px;
-    padding: 20px;
-    background-color: #f9f9f9;
-  }
-</style>
-
-
+    .tab-content {
+        border: 1px solid #ddd;
+        border-radius: 0 0 5px 5px;
+        padding: 20px;
+        background-color: #f9f9f9;
+    }
+    </style>
 
 @stop
 
-@section('content')
+@section('content_body')
 
     <!-- datatables-users de Dados -->
     <div class="row">
@@ -166,7 +164,7 @@
                                 <div class="form-group input-group-sm">
                                     <label class="form-label" data-toggle="tooltip" title="Marcar se o Usuário está Ativo">Ativo</label>
                                     <label class="switch">
-                                        <input type="checkbox" id="ativo" name="ativo" class="switch-input" data-toggle="tooltip" title="Marcar se o Usuário está Ativo">
+                                        <input type="checkbox" id="ativo" class="switch-input" data-toggle="tooltip" title="Marcar se o Usuário está Ativo">
                                         <span class="switch-label" data-on="SIM" data-off="NÃO"></span>
                                         <span class="switch-handle"></span>
                                     </label>
@@ -373,326 +371,314 @@
         </div>
     </div>
 
-    <script type="text/javascript">
+@stop
 
-        const ERROR_HTTP_STATUS = new Set([401, 419]); // 401-UNAUTHORIZED, 403-FORBIDDEN, 419-PAGE_EXPIRED, 404-NOT_FOUND, 500-INTERNAL_SERVER_ERROR
+@section('css')
+    {{-- Add here extra stylesheets --}}
+    {{-- <link rel="stylesheet" href="/css/admin_custom.css"> --}}
+@stop
 
-        $(document).ready(function () {
+@push('css')
+<style type="text/css">
 
-            let id = '';
-            let perfil_id = '';
-            var autorizacoes = '';
+    {{-- You can add AdminLTE customizations here --}}
 
-            $.ajaxSetup({
-                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },  // valida o X-CSRF-TOKEN
-                statusCode: { 401: function() { window.location.href = "/login";} },        // 401-UNAUTHORIZED redireciona para login
-            });
+    /* Aumenta o z-index do segundo modal */
+    .modal.fade {
+        z-index: 1050; /* z-index padrão do Bootstrap 4 */
+    }
 
-            /*
-            * Cria o datatables de Usuários
-            */
-            $('#datatables-users').DataTable({
-                processing: true,
-                // serverSide: true,
-                responsive: true,
-                autoWidth: true,
-                // order: [ 1, 'asc' ],
-                lengthMenu: [[5, 10, 15, 30, 50, -1], [5, 10, 15, 30, 50, "Todos"]], 
-                pageLength: 10,
-                ajax: {
-                    type: "GET",
-                    url: "{{url("user")}}",                             // rota
-                    dataSrc: function (json) {
-                        let autorizacoes = json.autorizacoes;           // Rotas autorizadas
-                        // console.log(autorizacoes);                   // Rotas autorizadas
+    #alertModal.modal.fade.show {
+        z-index: 1060; /* Maior z-index para garantir que o modal 2 sobreponha o modal 1 */
+    }         
 
-                        // controle do botão Inserir Novo
-                        if (json.autorizacoes.includes('user.store')) { $("#btnInserirNovo").show(); } else { $("#btnInserirNovo").hide(); }
+</style>
+@endpush
 
-                        // controle do botão Salvar do Modal de Edição
-                        if (json.autorizacoes.includes('user.update')) { $("#btnUserSalvar").show(); } else { $("#btnUserSalvar").hide(); }
+@section('js')
+    <script> console.log("Hi, I'm using the Laravel-AdminLTE package!"); </script>
+@stop
 
-                        return json.data;                           // Retorna lista de dados para o DataTables
-                    },                    
-                },
-                // language: { url: "{{ asset('vendor/datatables/DataTables.pt_BR.json') }}" },
-                rowId: 'id',
-                columns: [
-                    {"data": "id", "name": "users.id", "class": "dt-right", "title": "#", "width": "30px"},
-                    {"data": "name", "name": "users.name", "class": "dt-left", "title": "Nome", "width": "150px",
-                        render: function (data) { return '<b>' + data + '</b>';}},
-                    {"data": "email", "name": "users.email", "class": "dt-left", "title": "E-Mail", "width": "auto"},
-                    {"data": "perfis", "name": "users.perfis", "searchable":false, "orderable": false, "class": "dt-left", "title": "Perfis de Acesso", "width": "auto",
-                        render: function(data, type, row, json) {
+@push('js')
+<script type="text/javascript">
 
-                            var btnConcederPerfil = '';
-                            var listarPerfis = '';
+    const ERROR_HTTP_STATUS = new Set([401, 419]); // 401-UNAUTHORIZED, 403-FORBIDDEN, 419-PAGE_EXPIRED, 404-NOT_FOUND, 500-INTERNAL_SERVER_ERROR
 
-                            // controle botão btnConcederPerfil
-                            if (row.autorizacoes.includes('user.concederPerfil')) {
-                                btnConcederPerfil = '<button class="btn btn-xs btn-success btnConcederPerfil" data-toggle="tooltip" title="Conceder Perfis de Acesso ao Usuário">Conceder</button> ';
-                            }                            
+    $(document).ready(function () {
 
-                            // controla a lista listarPerfis
-                            if (row.autorizacoes.includes('user.listarPerfis')) {
-                                listarPerfis = $.map(data, function(d, i) {
-                                    return '<button id="' + d.id + '" class="btn btn-xs btn-' + ( d.id <= 1 ? 'default' : 'info btnPerfilVer' ) + '" data-perfil_id="' + d.id + '" data-toggle="tooltip" title="' + ( d.id <= 1 ? 'Entidade Padrão não pode ser editada.' : 'Administrar as Permissões concedidas à Entidade' ) + ' (' + d.nome + ')">' + d.nome + '</button> ';
-                                }).join(' ');
-                            }
-                            
-                            return btnConcederPerfil + listarPerfis;
-                            
-                    }},
-                    // {"data": "created_at", "name": "users.created_at", "class": "dt-center", "title": "Criado em", "width": "130px",
-                    //     render: function (data) { return new Date(data).toLocaleString('pt-BR'); }
-                    // },
-                    {"data": "ativo", "name": "users.ativo", "class": "dt-center", "title": "Ativo", "width": "30px"},
-                    {"data": "updated_at", "name": "users.updated_at", "title": "Atualizado em", "width": "130px", 
-                        render: function (data) { return new Date(data).toLocaleString([], {day: "2-digit",month: "2-digit",year: "numeric",hour: "2-digit",minute: "2-digit"}); }
-                    },
-                    {"data": "id", "botoes": "", "orderable": false, "class": "dt-center", "title": "Ações", "width": "80px", 
-                        render: function (data, type, row) { 
+        // traduz o DataTables
+        // $.extend(true, $.fn.dataTable.defaults, {
+        //     language: {
+        //         url: "{{ asset('vendor/datatables/DataTables.pt_BR.json') }}"
+        //     }
+        // });            
 
-                            btnEditar = '';                 // esconde botoes
-                            btnExcluir = '';                // esconde botoes
+        let id = '';
+        let perfil_id = '';
+        var autorizacoes = '';
 
-                            // controle botão Ver
-                            if (row.autorizacoes.includes('user.show')) {
-                                btnEditar = '<button type="button" class="btnUserEditar btn btn-primary btn-xs" data-operacao="ver" data-toggle="tooltip" title="Ver o registro atual">Ver</button> ';
-                            }
+        $.ajaxSetup({
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },  // valida o X-CSRF-TOKEN
+            statusCode: { 401: function() { window.location.href = "/login";} },        // 401-UNAUTHORIZED redireciona para login
+        });
 
-                            // // controle botão Editar
-                            if (row.autorizacoes.includes('user.update')) {
-                                btnEditar = '<button type="button" class="btnUserEditar btn btn-primary btn-xs" data-operacao="salvar" data-toggle="tooltip" title="Editar o registro atual">Editar</button> ';
-                            }
+        /*
+        * Cria o datatables de Usuários
+        */
+        $('#datatables-users').DataTable({
+            processing: true,
+            // serverSide: true,
+            responsive: true,
+            autoWidth: true,
+            // order: [ 1, 'asc' ],
+            lengthMenu: [[5, 10, 15, 30, 50, -1], [5, 10, 15, 30, 50, "Todos"]], 
+            pageLength: 10,
+            ajax: {
+                type: "GET",
+                url: "{{url("user")}}",                             // rota
+                dataSrc: function (json) {
+                    let autorizacoes = json.autorizacoes;           // Rotas autorizadas
+                    // console.log(autorizacoes);                   // Rotas autorizadas
 
-                            // // controle botão Excluir
-                            if (row.autorizacoes.includes('user.destroy')) {
-                                btnExcluir = '<button type="button" class="btnUserExcluir btn btn-danger btn-xs" data-operacao="excluir" data-toggle="tooltip" title="Excluir o registro atual">Excluir</button> ';
-                            }
+                    // controle do botão Inserir Novo
+                    if (json.autorizacoes.includes('user.store')) { $("#btnInserirNovo").show(); } else { $("#btnInserirNovo").hide(); }
 
-                            return btnEditar + btnExcluir; 
-
-                            // As Estidades Básica (id=[1-5]) não podem ser excluídas
-                            // return ( row.id > 1 ? '<button class="btnUserEditar btn btn-primary btn-xs" data-toggle="tooltip" title="Editar o registro atual">Editar</button> ' : 
-                            //                       '<button class="btnUserEditar btn btn-default btn-xs" data-toggle="tooltip" title="Ver o registro atual">Ver</button>' )  + 
-                            //        ( row.id > 1 ? '<button class="btnUserExcluir btn btn-danger btn-xs" data-toggle="tooltip" title="Excluir o registro atual">Excluir</button> ' : ' ' ) +
-                            //        ''; 
-                            //    '<button class="btnRotas btn btn-info btn-xs" data-toggle="tooltip" title="Editar as Rotas da Entidade atual">Perfis</button> '; 
-                        }
-                    },
-                ]
-            });
-
-            /*
-            * Editar o Usuário
-            */
-            $("#datatables-users tbody").delegate('tr td .btnPerfilVer', 'click', function (e) {
-                e.stopImmediatePropagation();           
-                
-                var perfil_id = $(this).data("perfil_id");
-
-                $.ajax({
-                    type: "GET",
-                    url: "{{url("perfil/show")}}",
-                    data: { "id": perfil_id},
-                    dataType: 'json',
-                    success: function (response) {
-
-                        // monta guia detalhes do Perfil
-                        $('#modalPerfilVer #modalLabel').html('Ver o Perfil de Acesso');
-                        $('#modalPerfilVer #id').val(response.id);
-                        $('#modalPerfilVer #nome').val(response.nome);
-                        $('#modalPerfilVer #descricao').val(response.descricao);
-                        $('#modalPerfilVer #ativo').prop('checked', (response.ativo == "SIM" ? true : false));
-
-                        $('#tblAutorizacoes').DataTable().destroy();  // Destrói a instância existente
-                        $('#minhaTabela tbody').empty();
-
-                        // monta guia tabela de autorizações
-                        tblAutorizacoesLinhas = '';
-                        $.each(response.autorizacoes, function(i, obj){
-                            tblAutorizacoesLinhas += '' + 
-                            '<tr id="tr' + obj.id + '">' + 
-                                '<td>' + (i+1) + '</td>' + 
-                                '<td>' + obj.rota.descricao + '</td>' + 
-                                '<td>' + obj.rota.rota + '</td>' + 
-                                '<td class="text-center">' + 
-                                    '<label class="switch">' + 
-                                    // '<input type="checkbox" id="' + obj.id + '" data-perfil_id="' + perfil_id + '" data-rota_id="' + obj.id + '" ' + ( obj.ativo == 'SIM' ? 'checked' : '' ) + '  class="switch-input" data-toggle="tooltip" title="Incluir">' + 
-                                    '<input type="checkbox" id="' + obj.id + '" data-autorizacao_id="' + obj.id + '" ' + ( obj.ativo == 'SIM' ? 'checked' : '' ) + '  class="switch-input" data-toggle="tooltip" title="Incluir">' + 
-                                    '<span class="switch-label" data-on="SIM" data-off="NÃO"></span>' + 
-                                    '<span class="switch-handle"></span>' + 
-                                    '</label>' + 
-                                '</td>' + 
-                            '</tr>';
-                        })
-                        tblAutorizacoesLinhas = tblAutorizacoesLinhas ? tblAutorizacoesLinhas : '<tr><td class="text-center" colspan="4">Nenhuma Autorização encontrada</td></tr>';
-                        $('#bodyAutorizacoes').empty().append(tblAutorizacoesLinhas);    // adiciona as linhas na tabela   
-
-                        // Renderiza o DataTable com os dados populados
-                        $('#tblAutorizacoes').DataTable({
-                            lengthMenu: [[5, 10, 15, 30, 50, -1], [5, 10, 15, 30, 50, "Todos"]], 
-                            pageLength: 5,
-                            autoWidth: true,
-                        });
-                        $('#modalPerfilVer').modal('show');                             // show modal  
-                    },
-                    error: function (error) {
-                        if (ERROR_HTTP_STATUS.has(error.status)) { window.location.href = "{{ url('/login') }}"; return; } 
-                        $('#alertModal .modal-body').html(error.responseJSON.message)
-                        $('#alertModal').modal('show');
+                    // controle do botão Salvar do Modal de Edição
+                    if (json.autorizacoes.includes('user.update')) { 
+                        $("#btnUserSalvar").show(); 
+                        $('#modalUserEditar #modalLabel').html('Editar Usuário');
+                    } else { 
+                        $("#btnUserSalvar").hide(); 
+                        $('#modalUserEditar #modalLabel').html('Ver Usuário');
                     }
-                }); 
-            });
 
-            /**
-             * ações ao clicar sobre os checkbox e mudar seu estado: tr td :checkbox
-             */
-            $("#tblAutorizacoes tbody").delegate('tr td :checkbox', 'click', function (e) {
-                e.stopImmediatePropagation();                 
+                    return json.data;                           // Retorna lista de dados para o DataTables
+                },                    
+            },
+            rowId: 'id',
+            columns: [
+                {"data": "id", "name": "users.id", "class": "dt-center", "title": "#", "width": "20px"},
+                {"data": "name", "name": "users.name", "class": "dt-left", "title": "Nome", "width": "140px",
+                    render: function (data) { return '<b>' + data + '</b>';}},
+                {"data": "email", "name": "users.email", "class": "dt-left", "title": "E-Mail", "width": "auto"},
+                {"data": "perfis", "name": "users.perfis", "searchable":false, "orderable": false, "class": "dt-left", "title": "Perfis de Acesso", "width": "auto",
+                    render: function(data, type, row, json) {
 
-                var chkObjeto = $(this).attr("id");
-                var autorizacao_id = $(this).data("autorizacao_id");
-                var ativo     = $(this).is(":checked") ? "SIM" : "NÃO";
+                        var btnConcederPerfil = '';
+                        var listarPerfis = '';
+
+                        // controle botão btnConcederPerfil
+                        if (row.autorizacoes.includes('user.concederPerfil')) {
+                            btnConcederPerfil = '<button class="btn btn-xs btn-success btnConcederPerfil" data-toggle="tooltip" title="Conceder Perfis de Acesso ao Usuário">Conceder</button> ';
+                        }                            
+
+                        // controla a lista listarPerfis
+                        if (row.autorizacoes.includes('user.listarPerfis')) {
+                            listarPerfis = $.map(data, function(d, i) {
+                                return '<button id="' + d.id + '" class="btn btn-xs btn-' + ( d.id <= 1 ? 'default' : 'info btnPerfilVer' ) + '" data-perfil_id="' + d.id + '" data-toggle="tooltip" title="' + ( d.id <= 1 ? 'Entidade Padrão não pode ser editada.' : 'Administrar as Permissões concedidas à Entidade' ) + ' (' + d.nome + ')">' + d.nome + '</button> ';
+                            }).join(' ');
+                        }
+                        
+                        return btnConcederPerfil + listarPerfis;                            
+                    }
+                },
+                {"data": "ativo", "name": "users.ativo", "class": "dt-center", "title": "Ativo", "width": "30px",
+                    render: function (data) { return '<span class="' + ( data == 'SIM' ? 'text-primary' : 'text-danger') + '">' + data + '</span>';}
+                },
+                {"data": "updated_at", "name": "users.updated_at", "title": "Atualizado em", "width": "110px", 
+                    render: function (data) { return new Date(data).toLocaleString([], {day: "2-digit",month: "2-digit",year: "numeric",hour: "2-digit",minute: "2-digit"}); }
+                },
+                {"data": "id", "botoes": "", "orderable": false, "class": "dt-center", "title": "Ações", "width": "80px", 
+                    render: function (data, type, row) { 
+
+                        btnEditar = '';                 // esconde botoes
+                        btnExcluir = '';                // esconde botoes
+
+                        // controle botão Ver
+                        if (row.autorizacoes.includes('user.show')) {
+                            btnEditar = '<button type="button" class="btnUserEditar btn btn-primary btn-xs" data-operacao="ver" data-toggle="tooltip" title="Ver o registro atual">Ver</button> ';
+                        }
+
+                        // // controle botão Editar
+                        if (row.autorizacoes.includes('user.update')) {
+                            btnEditar = '<button type="button" class="btnUserEditar btn btn-primary btn-xs" data-operacao="salvar" data-toggle="tooltip" title="Editar o registro atual">Editar</button> ';
+                        }
+
+                        // // controle botão Excluir
+                        if (row.autorizacoes.includes('user.destroy')) {
+                            btnExcluir = '<button type="button" class="btnUserExcluir btn btn-danger btn-xs" data-operacao="excluir" data-toggle="tooltip" title="Excluir o registro atual">Excluir</button> ';
+                        }
+
+                        return btnEditar + btnExcluir; 
+                    }
+                },
+            ]
+        });
+
+        /*
+        * Editar o Usuário
+        */
+        $("#datatables-users tbody").delegate('tr td .btnPerfilVer', 'click', function (e) {
+            e.stopImmediatePropagation();           
+            
+            var perfil_id = $(this).data("perfil_id");
+
+            $.ajax({
+                type: "GET",
+                url: "{{url("perfil/show")}}",
+                data: { "id": perfil_id},
+                dataType: 'json',
+                success: function (response) {
+
+                    // monta guia detalhes do Perfil
+                    $('#modalPerfilVer #modalLabel').html('Ver o Perfil de Acesso');
+                    $('#modalPerfilVer #id').val(response.id);
+                    $('#modalPerfilVer #nome').val(response.nome);
+                    $('#modalPerfilVer #descricao').val(response.descricao);
+                    $('#modalPerfilVer #ativo').prop('checked', (response.ativo == "SIM" ? true : false));
+
+                    $('#tblAutorizacoes').DataTable().destroy();  // Destrói a instância existente
+                    $('#minhaTabela tbody').empty();
+
+                    // monta guia tabela de autorizações
+                    tblAutorizacoesLinhas = '';
+                    $.each(response.autorizacoes, function(i, obj){
+                        tblAutorizacoesLinhas += '' + 
+                        '<tr id="tr' + obj.id + '">' + 
+                            '<td>' + (i+1) + '</td>' + 
+                            '<td>' + obj.rota.descricao + '</td>' + 
+                            '<td>' + obj.rota.rota + '</td>' + 
+                            '<td class="text-center">' + 
+                                '<label class="switch">' + 
+                                // '<input type="checkbox" id="' + obj.id + '" data-perfil_id="' + perfil_id + '" data-rota_id="' + obj.id + '" ' + ( obj.ativo == 'SIM' ? 'checked' : '' ) + '  class="switch-input" data-toggle="tooltip" title="Incluir">' + 
+                                '<input type="checkbox" id="' + obj.id + '" data-autorizacao_id="' + obj.id + '" ' + ( obj.ativo == 'SIM' ? 'checked' : '' ) + '  class="switch-input" data-toggle="tooltip" title="Incluir">' + 
+                                '<span class="switch-label" data-on="SIM" data-off="NÃO"></span>' + 
+                                '<span class="switch-handle"></span>' + 
+                                '</label>' + 
+                            '</td>' + 
+                        '</tr>';
+                    })
+                    tblAutorizacoesLinhas = tblAutorizacoesLinhas ? tblAutorizacoesLinhas : '<tr><td class="text-center" colspan="4">Nenhuma Autorização encontrada</td></tr>';
+                    $('#bodyAutorizacoes').empty().append(tblAutorizacoesLinhas);    // adiciona as linhas na tabela   
+
+                    // Renderiza o DataTable com os dados populados
+                    $('#tblAutorizacoes').DataTable({
+                        lengthMenu: [[5, 10, 15, 30, 50, -1], [5, 10, 15, 30, 50, "Todos"]], 
+                        pageLength: 5,
+                        autoWidth: true,
+                    });
+                    $('#modalPerfilVer').modal('show');                             // show modal  
+                },
+                error: function (error) {
+                    if (ERROR_HTTP_STATUS.has(error.status)) { window.location.href = "{{ url('/login') }}"; return; } 
+                    $('#alertModal .modal-body').html(error.responseJSON.message)
+                    $('#alertModal').modal('show');
+                }
+            }); 
+        });
+
+        /**
+         * ações ao clicar sobre os checkbox e mudar seu estado: tr td :checkbox
+         */
+        $("#tblAutorizacoes tbody").delegate('tr td :checkbox', 'click', function (e) {
+            e.stopImmediatePropagation();                 
+
+            var chkObjeto = $(this).attr("id");
+            var autorizacao_id = $(this).data("autorizacao_id");
+            var ativo     = $(this).is(":checked") ? "SIM" : "NÃO";
+
+            $.ajax({
+                type: "POST",
+                url: "{{url("autorizacao/authorizar")}}",
+                data: { "id":autorizacao_id, "ativo":ativo },
+                // data: { "perfil_id":perfil_id, "rota_id":rota_id, "ativo":ativo },
+                dataType: 'json',
+                success: function (data) {
+                    // nesse caso sucesso não precisa exibir confirmação por ser um switchbox
+                    // console.log(data)
+                },
+                error: function (error) {
+                    // alert('error');
+                    if (ERROR_HTTP_STATUS.has(error.status)) {
+                        window.location.href = "{{ url('/login') }}";
+                        return;
+                    } 
+
+                    // retorna o checkbox para o estado anterior
+                    $('#'+chkObjeto).prop('checked', (ativo == 'SIM' ? false : true));               
+                    $('#alertModal .modal-body').html(error.responseJSON.message)
+                    $('#alertModal').modal('show');   
+                }
+            });                 
+        
+        });               
+
+        /**
+         * Editar o Usuário
+         */    
+        $("#datatables-users tbody").delegate('tr td .btnUserEditar', 'click', function (e) {
+            e.stopImmediatePropagation();            
+
+            const id = $(this).parents('tr').attr("id");
+
+            $.ajax({
+                type: "GET",
+                url: "{{url("user/show")}}",
+                data: {"id": id},
+                dataType: 'json',
+                success: function (data) {
+                    // prepara o form
+                    $("#formUserEditar .invalid-feedback").text('').hide();
+                    $('#formUserEditar').trigger("reset");
+                    $('#msgOperacaoEditar').text('').hide();
+                    $('#modalUserEditar #form-group-id').show();
+                    $('#modalUserEditar #modalLabel').html('Editar Usuário'); 
+                    $('#modalUserEditar').modal('show');
+
+                    // carrega os dados no form
+                    $('#formUserEditar #id').val(data.id);
+                    $('#formUserEditar #name').val(data.name);
+                    $('#formUserEditar #email').val(data.email);
+                    $('#formUserEditar #email').val(data.email);
+                    $('#formUserEditar #ativo').prop('checked', (data.ativo == "SIM" ? true : false));
+                },
+                error: function (error) {
+                    if (ERROR_HTTP_STATUS.has(error.status)) {
+                        window.location.href = "{{ url('/login') }}";
+                        return;
+                    } 
+                    $('#alertModal .modal-body').html(error.responseJSON.message)
+                    $('#alertModal').modal('show');
+                }
+            });                 
+        });             
+
+        /*
+        * Excluir o Usuário
+        */
+        $("#datatables-users tbody").delegate('tr td .btnUserExcluir', 'click', function (e) {
+            e.stopImmediatePropagation();            
+
+            id = $(this).parents('tr').attr("id");
+
+            //abre Form Modal Bootstrap e pede confirmação da Exclusão do Registro
+            $('#msgOperacaoExcluir').text('');
+            $("#confirmaExcluirModal .modal-body p").text('').text('Você está certo que deseja Excluir esta Entidade ID: ' + id + '?' + "\n\r\n\r" + 'Todas as Rotas que pertencem a esta Entidade também serão excluídas.');
+            $('#confirmaExcluirModal').modal('show');
+
+            //se confirmar a Exclusão, exclui o Registro via Ajax
+            $('#confirmaExcluirModal').find('.modal-footer #confirm').on('click', function (e) {
+                e.stopImmediatePropagation();
 
                 $.ajax({
                     type: "POST",
-                    url: "{{url("autorizacao/authorizar")}}",
-                    data: { "id":autorizacao_id, "ativo":ativo },
-                    // data: { "perfil_id":perfil_id, "rota_id":rota_id, "ativo":ativo },
-                    dataType: 'json',
-                    success: function (data) {
-                        // nesse caso sucesso não precisa exibir confirmação por ser um switchbox
-                        // console.log(data)
-                    },
-                    error: function (error) {
-                        // alert('error');
-                        if (ERROR_HTTP_STATUS.has(error.status)) {
-                            window.location.href = "{{ url('/login') }}";
-                            return;
-                        } 
-
-                        // retorna o checkbox para o estado anterior
-                        $('#'+chkObjeto).prop('checked', (ativo == 'SIM' ? false : true));               
-                        $('#alertModal .modal-body').html(error.responseJSON.message)
-                        $('#alertModal').modal('show');   
-                    }
-                });                 
-               
-            });               
-
-            $("#datatables-users tbody").delegate('tr td .btnUserEditar', 'click', function (e) {
-                e.stopImmediatePropagation();            
-
-                const id = $(this).parents('tr').attr("id");
-
-                $.ajax({
-                    type: "GET",
-                    url: "{{url("user/show")}}",
+                    url: "{{url("user/destroy")}}",
                     data: {"id": id},
                     dataType: 'json',
                     success: function (data) {
-                        $("#formUserEditar .invalid-feedback").text('').hide();
-                        $('#formUserEditar').trigger("reset");
-                        $('#modalUserEditar #form-group-id').show();            
-                        $('#modalUserEditar #modalLabel').html((data.id == 1 ? 'Ver' : 'Editar') + ' Usuário');
-                        $('#modalUserEditar').modal('show');
-                        $('#msgOperacaoEditar').text('').hide();
-
-                        // carrega os dados no form
-                        $('#formRota #entidade_id').val(data.id);
-                        $('#formUserEditar #id').val(data.id);
-                        $('#formUserEditar #name').val(data.name);
-                        $('#formUserEditar #email').val(data.email);
-                        $('#formUserEditar #email').val(data.email);
-                        $('#formUserEditar #ativo').prop('checked', (data.ativo == "SIM" ? true : false));
-
-                        // if(data.id == 1) {
-                        //     $('#btnUserSalvar').hide();
-                        // } else {
-                        //     $('#btnUserSalvar').show();
-                        // }
-                    },
-                    error: function (error) {
-                        if (ERROR_HTTP_STATUS.has(error.status)) {
-                            window.location.href = "{{ url('/login') }}";
-                            return;
-                        } 
-
-                        $('#alertModal .modal-body').html(error.responseJSON.message)
-                        $('#alertModal').modal('show');
-                    }
-                });                 
-            });             
-
-            /*
-            * Excluir o Usuário
-            */
-            $("#datatables-users tbody").delegate('tr td .btnUserExcluir', 'click', function (e) {
-                e.stopImmediatePropagation();            
-
-                id = $(this).parents('tr').attr("id");
-
-                //abre Form Modal Bootstrap e pede confirmação da Exclusão do Registro
-                $('#msgOperacaoExcluir').text('');
-                $("#confirmaExcluirModal .modal-body p").text('').text('Você está certo que deseja Excluir esta Entidade ID: ' + id + '?' + "\n\r\n\r" + 'Todas as Rotas que pertencem a esta Entidade também serão excluídas.');
-                $('#confirmaExcluirModal').modal('show');
-
-                //se confirmar a Exclusão, exclui o Registro via Ajax
-                $('#confirmaExcluirModal').find('.modal-footer #confirm').on('click', function (e) {
-                    e.stopImmediatePropagation();
-
-                    $.ajax({
-                        type: "POST",
-                        url: "{{url("user/destroy")}}",
-                        data: {"id": id},
-                        dataType: 'json',
-                        success: function (data) {
-                            $("#alert .alert-content").text('Excluiu o registro ID ' + id + ' com sucesso.');
-                            $('#alert').removeClass().addClass('alert alert-success').show().delay(5000).fadeOut(1000);
-                            $('#confirmaExcluirModal').modal('hide');
-                            $('#datatables-users').DataTable().ajax.reload(null, false);
-                        },
-                        error: function (error) {
-                            if (ERROR_HTTP_STATUS.has(error.status)) {
-                                window.location.href = "{{ url('/login') }}";
-                                return;
-                            } 
-
-                            if(error.responseJSON.message.indexOf("1451") != -1) {
-                                $('#msgOperacaoExcluir').text('Impossível EXCLUIR porque há registros relacionados. (SQL-1451)').show();
-                            } else {
-                                $('#msgOperacaoExcluir').text(error.responseJSON.message).show();
-                            }
-                        }
-                    });
-                    
-                });
-
-            });           
-
-            /*
-            * Salvar o Usuário
-            */
-            $('#btnUserSalvar').on("click", function (e) {
-                e.stopImmediatePropagation();
-                
-                $(".invalid-feedback").text('').hide();    
-                const formData = new FormData($('#formUserEditar').get(0));
-                formData.append('ativo', getAtivoValue());
-
-                $.ajax({
-                    type: "POST",
-                    url: "{{url("user/store")}}",
-                    data: formData,
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    success: function (data) {
-                        $("#alert .alert-content").text('Salvou registro ID ' + data.id + ' com sucesso.');
+                        $("#alert .alert-content").text('Excluiu o registro ID ' + id + ' com sucesso.');
                         $('#alert').removeClass().addClass('alert alert-success').show().delay(5000).fadeOut(1000);
-                        $('#modalUserEditar').modal('hide');
+                        $('#confirmaExcluirModal').modal('hide');
                         $('#datatables-users').DataTable().ajax.reload(null, false);
                     },
                     error: function (error) {
@@ -701,187 +687,214 @@
                             return;
                         } 
 
-                        // validator: vamos exibir todas as mensagens de erro do validador, como o dataType não é JSON, precisa do responseJSON
-                        $.each( error.responseJSON.errors, function( key, value ) {
-                            $("#error-" + key ).text(value).show(); 
-                        });
-
-                        // exibe mensagem sobre sucesso da operação
-                        if(error.responseJSON.message.indexOf("1062") != -1) {
-                            $('#msgOperacaoEditar').text("Impossível SALVAR! Registro já existe. (SQL-1062)").show();
-                        } 
-                        if(! error.responseJSON.errors) {
-                            $('#msgOperacaoEditar').text(error.responseJSON.message).show();
+                        if(error.responseJSON.message.indexOf("1451") != -1) {
+                            $('#msgOperacaoExcluir').text('Impossível EXCLUIR porque há registros relacionados. (SQL-1451)').show();
+                        } else {
+                            $('#msgOperacaoExcluir').text(error.responseJSON.message).show();
                         }
                     }
-                });                
+                });
+                
             });
 
-            /*
-            * Inserir Novo Usuário
-            */
-            $('#btnInserirNovo').on("click", function (e) {
-                e.stopImmediatePropagation();
+        });           
 
-                // $.ajax({
-                //     url: '/isAuthenticated',
-                //     method: 'GET',
-                //     success: function(response) {
-                //         if (!response.authenticated) window.location.href = "{{ url('/') }}";
-                //     },
-                //     error: function(jqXHR) {
-                //         if (jqXHR.status === 401) window.location.href = "{{ url('/') }}";
-                //     }
-                // });
-
-                $('#modalUserEditar #form-group-id').hide();            // hide ID field
-                $(".invalid-feedback").text('').hide();                 // hide all error displayed
-                $('#formUserEditar').trigger("reset");
-                $('#formUserEditar #ativo').prop('checked', true);      // default SIM
-                $('#modalUserEditar #modalLabel').html('Novo Usuário');          
-                $('#modalUserEditar').modal('show');                    // show modal 
-                $('#btnUserSalvar').show();
-            });
-
-            /**
-             * ações ao clicar no botão Conceder Perfil na linha da Tabela de Dados
-             */
-            $("#datatables-users tbody").delegate('tr td .btnConcederPerfil', 'click', function (e) {
-                e.stopImmediatePropagation();                
-
-                // const id = $(this).parents('tr').attr("id");
-                      id = $(this).parents('tr').attr("id");
-                const user_nome = $(this).parents('tr').find('td:eq(1)').text();
-                // alert('btnConcederPerfil ' + id);
-
-                $.ajax({
-                    type: "POST",
-                    url: "{{url("user/listarPerfis")}}",
-                    data: {"id": id},
-                    dataType: 'json',
-                    success: function (data) {
-
-                        tblPerfis = '';
-                        $habilitado = '';
-                        // console.log(data);
-
-                        $.each(data, function(i, obj){
-
-                            tblPerfis += '' + 
-                            '<tr id="' + obj.id + '">' + 
-                                '<td>' + (i+1) + '</td>' + 
-                                '<td>' + obj.id + ' ' + obj.nome + '</td>' + 
-                                // '<td>' + obj.nome + '</td>' + 
-                                // '<td class="text-center">' + ( id > 1 ? // Usuário 1-Admin sempre têm todos Perfis de Acesso
-                                '<td class="text-center">' + ( id >= 1 ? // Usuário 1-Admin sempre têm todos Perfis de Acesso
-                                    '<label class="switch">' + 
-                                    '<input type="checkbox" id="chk' + obj.id + '" ' + obj.concedido + ' data-user_id="' + id + '" data-perfil_id="' + obj.id + '" class="switch-input" data-toggle="tooltip" title="Incluir">' + 
-                                    '<span class="switch-label" data-on="SIM" data-off="NÃO"></span>' + 
-                                    '<span class="switch-handle"></span>' + 
-                                    '</label>' : 'SIM' ) +
-                                '</td>' + 
-                            '</tr>' + "\n";
-
-                        })
-                        tblPerfis = tblPerfis ? tblPerfis : '<tr><td class="text-center" colspan="2">Nenhuma registro</td></tr>';
-                        $('#modalConcederPerfil #tblPerfisConcedidos tbody').empty().append(tblPerfis);       // adiciona as linhas na tabela do modal
-                        $('#modalConcederPerfil #user_id').val(id);                                     // carrega o User ID no modal
-                        // $('#modalConcederPerfil #modalLabel').html('<h5><span class="badge badge-primary">' + user_nome + '</span></h5>Lista de Perfis de Acesso');
-                        $('#modalConcederPerfil #modalLabel').html('<h5><span class="badge badge-primary">' + user_nome + '</span></h5>');
-                        $('#modalConcederPerfil').modal('show');
-                    },
-                    error: function (error) {
-                        if (ERROR_HTTP_STATUS.has(error.status)) {
-                            window.location.href = "{{ url('/login') }}";
-                            return;
-                        } 
-
-                        $('#alertModal .modal-body').html(error.responseJSON.message)
-                        $('#alertModal').modal('show');
-                    }
-                }); 
-            });         
+        /*
+        * Salvar o Usuário
+        */
+        $('#btnUserSalvar').on("click", function (e) {
+            e.stopImmediatePropagation();
             
-            /**
-             * ações ao clicar sobre os checkbox do modal e mudar seu estado: tr td .btnInserirEntidade : tr td .chkEntidade
-             */
-            $("#tblPerfisConcedidos").delegate('tr :checkbox', 'click', function (e) {
-                e.stopImmediatePropagation();                 
+            $(".invalid-feedback").text('').hide();    
+            const formData = new FormData($('#formUserEditar').get(0));
+            formData.append('ativo', getAtivoValue());
 
-                var chkObjeto = $(this).attr("id");
-                var chkUser = $(this).data("user_id");
-                var chkPerfil = $(this).data("perfil_id");
-                var chkCheked = $(this).is(":checked") ? "SIM" : "NÃO";
-                var operacao = $(this).is(":checked") ? "inserir" : "excluir";
-                // alert('Clicou SWITCH: ' + chkObjeto + ', User:' + chkUser + ', Perfil:' + chkPerfil + ', Cheked:' + chkCheked );
+            $.ajax({
+                type: "POST",
+                url: "{{url("user/store")}}",
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    $("#alert .alert-content").text('Salvou registro ID ' + data.id + ' com sucesso.');
+                    $('#alert').removeClass().addClass('alert alert-success').show().delay(5000).fadeOut(1000);
+                    $('#modalUserEditar').modal('hide');
+                    $('#datatables-users').DataTable().ajax.reload(null, false);
+                },
+                error: function (error) {
+                    if (ERROR_HTTP_STATUS.has(error.status)) {
+                        window.location.href = "{{ url('/login') }}";
+                        return;
+                    } 
 
-                $.ajax({
-                    type: "POST",
-                    url: "{{url("user/concederPerfil")}}",
-                    data: {"operacao": operacao, "user_id":chkUser, "perfil_id":chkPerfil },
-                    dataType: 'json',
-                    success: function (data) {
-                        //alert(data);
-                        $('#btnRefresh').trigger('click');
-                    },
-                    error: function (error) {
-                        if (ERROR_HTTP_STATUS.has(error.status)) {
-                            window.location.href = "{{ url('/login') }}";
-                            return;
-                        } 
+                    // validator: vamos exibir todas as mensagens de erro do validador, como o dataType não é JSON, precisa do responseJSON
+                    $.each( error.responseJSON.errors, function( key, value ) {
+                        $("#error-" + key ).text(value).show(); 
+                    });
 
-                        $('#' + chkObjeto + ':checkbox').prop('checked', (chkCheked == 'SIM' ? false : true));
-                        // alert($('#' + chkObjeto).is(":checked"));
-                        $('#alertModal .modal-body').html(error.responseJSON.message)
-                        $('#alertModal').modal('show');                        
+                    // exibe mensagem sobre sucesso da operação
+                    if(error.responseJSON.message.indexOf("1062") != -1) {
+                        $('#msgOperacaoEditar').text("Impossível SALVAR! Registro já existe. (SQL-1062)").show();
+                    } 
+                    if(! error.responseJSON.errors) {
+                        $('#msgOperacaoEditar').text(error.responseJSON.message).show();
                     }
-                });                 
-               
-            });       
-
-            /*
-            * Refresh da tabela de dados
-            */
-            $('#btnRefresh').on("click", function (e) {
-                e.stopImmediatePropagation();
-                // $.ajax({
-                //     url: '/isAuthenticated',
-                //     method: 'GET',
-                //     success: function(response) {
-                //         if (!response.authenticated) window.location.href = "{{ url('/') }}";
-                //     },
-                //     error: function(jqXHR) {
-                //         if (jqXHR.status === 401) window.location.href = "{{ url('/') }}";
-                //     }
-                // });
-                $('#datatables-users').DataTable().ajax.reload(null, false);
-                $('#alert').trigger('reset').hide();
-            });      
-
-            // põe o foco no campo name 
-            $('body').on('shown.bs.modal', '#modalUserEditar', function () {
-                $('#name').focus();
-            })
-
-            function getAtivoValue() {
-                return $('#ativo:checked').val() ? 'SIM': 'NÃO';
-            }            
-
+                }
+            });                
         });
 
-    </script>    
+        /*
+        * Inserir Novo Usuário
+        */
+        $('#btnInserirNovo').on("click", function (e) {
+            e.stopImmediatePropagation();
 
-@stop
+            // $.ajax({
+            //     url: '/isAuthenticated',
+            //     method: 'GET',
+            //     success: function(response) {
+            //         if (!response.authenticated) window.location.href = "{{ url('/') }}";
+            //     },
+            //     error: function(jqXHR) {
+            //         if (jqXHR.status === 401) window.location.href = "{{ url('/') }}";
+            //     }
+            // });
 
-<style>
+            $('#modalUserEditar #form-group-id').hide();            // hide ID field
+            $(".invalid-feedback").text('').hide();                 // hide all error displayed
+            $('#formUserEditar').trigger("reset");
+            $('#formUserEditar #ativo').prop('checked', true);      // default SIM
+            $('#modalUserEditar #modalLabel').html('Novo Usuário');          
+            $('#modalUserEditar').modal('show');                    // show modal 
+            $('#btnUserSalvar').show();
+        });
 
-    /* Aumenta o z-index do segundo modal */
-    .modal.fade {
-    z-index: 1050; /* z-index padrão do Bootstrap 4 */
-    }
+        /**
+         * ações ao clicar no botão Conceder Perfil na linha da Tabela de Dados
+         */
+        $("#datatables-users tbody").delegate('tr td .btnConcederPerfil', 'click', function (e) {
+            e.stopImmediatePropagation();                
 
-    #alertModal.modal.fade.show {
-    z-index: 1060; /* Maior z-index para garantir que o modal 2 sobreponha o modal 1 */
-    }        
+            // const id = $(this).parents('tr').attr("id");
+            id = $(this).parents('tr').attr("id");
+            const user_nome = $(this).parents('tr').find('td:eq(1)').text();
+            // alert('btnConcederPerfil ' + id);
 
-</style>    
+            $.ajax({
+                type: "POST",
+                url: "{{url("user/listarPerfis")}}",
+                data: {"id": id},
+                dataType: 'json',
+                success: function (data) {
+
+                    tblPerfis = '';
+                    $habilitado = '';
+                    // console.log(data);
+
+                    $.each(data, function(i, obj){
+
+                        tblPerfis += '' + 
+                        '<tr id="' + obj.id + '">' + 
+                            '<td>' + (i+1) + '</td>' + 
+                            '<td>' + obj.id + ' ' + obj.nome + '</td>' + 
+                            // '<td>' + obj.nome + '</td>' + 
+                            // '<td class="text-center">' + ( id > 1 ? // Usuário 1-Admin sempre têm todos Perfis de Acesso
+                            '<td class="text-center">' + ( id >= 1 ? // Usuário 1-Admin sempre têm todos Perfis de Acesso
+                                '<label class="switch">' + 
+                                '<input type="checkbox" id="chk' + obj.id + '" ' + obj.concedido + ' data-user_id="' + id + '" data-perfil_id="' + obj.id + '" class="switch-input" data-toggle="tooltip" title="Incluir">' + 
+                                '<span class="switch-label" data-on="SIM" data-off="NÃO"></span>' + 
+                                '<span class="switch-handle"></span>' + 
+                                '</label>' : 'SIM' ) +
+                            '</td>' + 
+                        '</tr>' + "\n";
+
+                    })
+                    tblPerfis = tblPerfis ? tblPerfis : '<tr><td class="text-center" colspan="2">Nenhuma registro</td></tr>';
+                    $('#modalConcederPerfil #tblPerfisConcedidos tbody').empty().append(tblPerfis);       // adiciona as linhas na tabela do modal
+                    $('#modalConcederPerfil #user_id').val(id);                                     // carrega o User ID no modal
+                    // $('#modalConcederPerfil #modalLabel').html('<h5><span class="badge badge-primary">' + user_nome + '</span></h5>Lista de Perfis de Acesso');
+                    $('#modalConcederPerfil #modalLabel').html('<h5><span class="badge badge-primary">' + user_nome + '</span></h5>');
+                    $('#modalConcederPerfil').modal('show');
+                },
+                error: function (error) {
+                    if (ERROR_HTTP_STATUS.has(error.status)) {
+                        window.location.href = "{{ url('/login') }}";
+                        return;
+                    } 
+
+                    $('#alertModal .modal-body').html(error.responseJSON.message)
+                    $('#alertModal').modal('show');
+                }
+            }); 
+        });         
+        
+        /**
+         * ações ao clicar sobre os checkbox do modal e mudar seu estado: tr td .btnInserirEntidade : tr td .chkEntidade
+         */
+        $("#tblPerfisConcedidos").delegate('tr :checkbox', 'click', function (e) {
+            e.stopImmediatePropagation();                 
+
+            var chkObjeto = $(this).attr("id");
+            var chkUser = $(this).data("user_id");
+            var chkPerfil = $(this).data("perfil_id");
+            var chkCheked = $(this).is(":checked") ? "SIM" : "NÃO";
+            var operacao = $(this).is(":checked") ? "inserir" : "excluir";
+            // alert('Clicou SWITCH: ' + chkObjeto + ', User:' + chkUser + ', Perfil:' + chkPerfil + ', Cheked:' + chkCheked );
+
+            $.ajax({
+                type: "POST",
+                url: "{{url("user/concederPerfil")}}",
+                data: {"operacao": operacao, "user_id":chkUser, "perfil_id":chkPerfil },
+                dataType: 'json',
+                success: function (data) {
+                    //alert(data);
+                    $('#btnRefresh').trigger('click');
+                },
+                error: function (error) {
+                    if (ERROR_HTTP_STATUS.has(error.status)) {
+                        window.location.href = "{{ url('/login') }}";
+                        return;
+                    } 
+
+                    $('#' + chkObjeto + ':checkbox').prop('checked', (chkCheked == 'SIM' ? false : true));
+                    // alert($('#' + chkObjeto).is(":checked"));
+                    $('#alertModal .modal-body').html(error.responseJSON.message)
+                    $('#alertModal').modal('show');                        
+                }
+            });                 
+        
+        });       
+
+        /*
+        * Refresh da tabela de dados
+        */
+        $('#btnRefresh').on("click", function (e) {
+            e.stopImmediatePropagation();
+            // $.ajax({
+            //     url: '/isAuthenticated',
+            //     method: 'GET',
+            //     success: function(response) {
+            //         if (!response.authenticated) window.location.href = "{{ url('/') }}";
+            //     },
+            //     error: function(jqXHR) {
+            //         if (jqXHR.status === 401) window.location.href = "{{ url('/') }}";
+            //     }
+            // });
+            $('#datatables-users').DataTable().ajax.reload(null, false);
+            $('#alert').trigger('reset').hide();
+        });      
+
+        // põe o foco no campo name 
+        $('body').on('shown.bs.modal', '#modalUserEditar', function () {
+            $('#name').focus();
+        })
+
+        function getAtivoValue() {
+            return $('#ativo:checked').val() ? 'SIM': 'NÃO';
+        }            
+
+    });
+
+</script>    
+@endpush

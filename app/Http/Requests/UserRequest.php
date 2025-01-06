@@ -25,7 +25,7 @@ class UserRequest extends FormRequest
             'name' => 'required|min:6',
             'email' => 'required|email|unique:users,email,' . $this->id,    // unique atendo nas vírgulas
             'password' => 'required|string|min:6|confirmed',
-            'password_confirmation' => 'required|min:8',
+            'password_confirmation' => 'required|min:6',
             'ativo' => ['required','in:"SIM","NÃO"'],
         ];
     }
