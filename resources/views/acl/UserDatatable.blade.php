@@ -105,12 +105,14 @@
                 </div>
 
                 <div class="card-body">
-                    <!-- compact | stripe | order-column | hover | cell-border | row-border | table-dark-->
-                    <table id="datatables-users" class="table table-striped table-bordered table-hover table-sm compact" style="width:100%">
-                        <thead></thead>
-                        <tbody></tbody>
-                        <tfoot></tfoot>                
-                    </table>                 
+                    <div class="table-responsive col-md-12">
+                        <!-- compact | stripe | order-column | hover | cell-border | row-border | table-dark-->
+                        <table id="datatables-users" class="table table-striped table-bordered table-hover table-sm compact" style="width:100%">
+                            <thead></thead>
+                            <tbody></tbody>
+                            <tfoot></tfoot>                
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -206,23 +208,25 @@
                             <fieldset class="border p-2">
                                 <legend class="w-auto h5">Perfis de Acesso</legend>
 
-                                <table id="tblPerfisConcedidos" class="table table-striped table-bordered table-hover table-sm compact" style="width:100%">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Perfil de Acesso</th>
-                                            <th>Concedidos ao Usuário</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                        </tr>
-                                    </tbody>
-                                    <tfoot></tfoot>                
-                                </table> 
+                                <div class="table-responsive col-md-12">
+                                    <table id="tblPerfisConcedidos" class="table table-striped table-bordered table-hover table-sm compact" style="width:100%">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Perfil de Acesso</th>
+                                                <th>Concedidos ao Usuário</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                            </tr>
+                                        </tbody>
+                                        <tfoot></tfoot>                
+                                    </table> 
+                                </div>
                             </fieldset>
 
                         </div>
@@ -340,25 +344,27 @@
                                 <legend class="w-auto h5">Ações Autorizadas</legend>
 
                                 <input type="hidden" id="perfil_id" value="">
-                                <table id="tblAutorizacoes" class="table table-striped table-bordered table-hover table-sm compact" style="width:100%">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Ação</th>
-                                            <th>Rota</th>
-                                            <th>Autorizada</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="bodyAutorizacoes">
-                                        <tr>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                        </tr>
-                                    </tbody>
-                                    <tfoot></tfoot>                
-                                </table> 
+                                <div class="table-responsive col-md-12">
+                                    <table id="tblAutorizacoes" class="table table-striped table-bordered table-hover table-sm compact" style="width:100%">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Ação</th>
+                                                <th>Rota</th>
+                                                <th>Autorizada</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="bodyAutorizacoes">
+                                            <tr>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                            </tr>
+                                        </tbody>
+                                        <tfoot></tfoot>                
+                                    </table> 
+                                </div>
                             </fieldset>
 
                     </div>

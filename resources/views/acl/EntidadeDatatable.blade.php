@@ -52,12 +52,14 @@
                 </div>
 
                 <div class="card-body">
-                    <!-- compact | stripe | order-column | hover | cell-border | row-border | table-dark-->
-                    <table id="datatables-entidades" class="table table-striped table-bordered table-hover table-sm compact" style="width:100%">
-                        <thead></thead>
-                        <tbody></tbody>
-                        <tfoot></tfoot>                
-                    </table>                 
+                    <div class="table-responsive col-md-12">
+                        <!-- compact | stripe | order-column | hover | cell-border | row-border | table-dark-->
+                        <table id="datatables-entidades" class="table table-striped table-bordered table-hover table-sm compact" style="width:100%">
+                            <thead></thead>
+                            <tbody></tbody>
+                            <tfoot></tfoot>                
+                        </table>                 
+                    </div>
                 </div>
             </div>
         </div>
@@ -146,26 +148,28 @@
                         <fieldset class="border p-2">
                             <legend class="w-auto h5">Ações (Rotas) Inseridas</legend>
 
-                            <table id="tblRotas" class="table table-striped table-bordered table-hover table-sm compact" style="width:100%">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Rota</th>
-                                        <th>Ação</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                <tbody id="tblRotasBody">
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                                <tfoot></tfoot>                
-                            </table> 
+                            <div class="table-responsive col-md-12">
+                                <table id="tblRotas" class="table table-striped table-bordered table-hover table-sm compact" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Rota</th>
+                                            <th>Ação</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tbody id="tblRotasBody">
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot></tfoot>                
+                                </table> 
+                            </div>
                         </fieldset>                        
 
                         <fieldset class="border p-2">

@@ -53,12 +53,14 @@
                 </div>
 
                 <div class="card-body">
-                    <!-- compact | stripe | order-column | hover | cell-border | row-border | table-dark-->
-                    <table id="datatables-perfils" class="table table-striped table-bordered table-hover table-sm compact" style="width:100%">
-                        <thead></thead>
-                        <tbody></tbody>
-                        <tfoot></tfoot>                
-                    </table>                 
+                    <div class="table-responsive col-md-12">
+                        <!-- compact | stripe | order-column | hover | cell-border | row-border | table-dark-->
+                        <table id="datatables-perfils" class="table table-striped table-bordered table-hover table-sm compact" style="width:100%">
+                            <thead></thead>
+                            <tbody></tbody>
+                            <tfoot></tfoot>                
+                        </table>                 
+                    </div>
                 </div>
             </div>
         </div>
@@ -142,28 +144,29 @@
                             
                             <fieldset class="border p-2">
                                 <legend class="w-auto h5">Ações (Rotas) da Entidade</legend>
-                                <table id="tblPermissoes" class="table table-striped table-bordered table-hover table-sm compact" style="width:100%">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Ação</th>
-                                            <th>Rota</th>
-                                            <th>Autorizado</th>
-                                            {{-- <th>Ação</th> --}}
-                                        </tr>
-                                    </thead>
-                                    <tbody id="tblPermissoesLinhas">
-                                        <tr>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            {{-- <td></td> --}}
-                                        </tr>
-                                    </tbody>
-                                    <tfoot></tfoot>                
-                                </table> 
-
+                                <div class="table-responsive col-md-12">
+                                    <table id="tblPermissoes" class="table table-striped table-bordered table-hover table-sm compact" style="width:100%">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Ação</th>
+                                                <th>Rota</th>
+                                                <th>Autorizado</th>
+                                                {{-- <th>Ação</th> --}}
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tblPermissoesLinhas">
+                                            <tr>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                {{-- <td></td> --}}
+                                            </tr>
+                                        </tbody>
+                                        <tfoot></tfoot>                
+                                    </table>
+                                </div>
                             </fieldset>
 
                         </div>
@@ -200,24 +203,26 @@
                                 <legend class="w-auto h5">Entidades com acesso concedido</legend>
 
                                 <input type="hidden" id="perfil_id" value="">
-                                <table id="tblEntidadesNaoInseridas" class="table table-striped table-bordered table-hover table-sm compact" style="width:100%">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Entidade</th>
-                                            <th>Concedida ao Perfil</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tbody id="tblEntidadesBody">
-                                        <tr>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                        </tr>
-                                    </tbody>
-                                    <tfoot></tfoot>                
-                                </table> 
+                                <div class="table-responsive col-md-12">
+                                    <table id="tblEntidadesNaoInseridas" class="table table-striped table-bordered table-hover table-sm compact" style="width:100%">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Entidade</th>
+                                                <th>Concedida ao Perfil</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tbody id="tblEntidadesBody">
+                                            <tr>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                            </tr>
+                                        </tbody>
+                                        <tfoot></tfoot>                
+                                    </table> 
+                                </div>
                             </fieldset>
 
                         </div>
