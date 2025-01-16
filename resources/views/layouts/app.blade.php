@@ -1,7 +1,6 @@
 @extends('adminlte::page')
 
 {{-- Extend and customize the browser title --}}
-
 @section('title')
     {{ config('adminlte.title') }}
     @hasSection('subtitle') | @yield('subtitle') @endif
@@ -78,14 +77,12 @@
 
     <strong>
         <a href="{{ config('app.company_url', '#') }}">
-            {{ config('app.company_name', 'My company') }}
+            {{ config('app.company_name', 'ACL') }}
         </a>
     </strong>
 @stop
 
-
 {{-- Add common CSS customizations --}}
-
 @push('css')
 <style type="text/css">
 
@@ -97,6 +94,21 @@
         font-weight: 600;
     }
     */
+
+    /* centraliza conteúdo de coluna do DataTables */
+    .dt-center {
+        text-align: center !important;
+    }       
+
+    /* Aumenta o z-index do segundo modal */
+    .modal.fade {
+        z-index: 1050; /* z-index padrão do Bootstrap 4 */
+    }
+
+    #modal2.modal.fade.show {
+        z-index: 1060; /* Maior z-index para garantir que o modal 2 sobreponha o modal 1 */
+    }        
+
 
 </style>
 @endpush

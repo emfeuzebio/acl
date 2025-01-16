@@ -16,65 +16,6 @@
         </div>
     </div>
 
-    <style>
-
-        .dt-center {
-            text-align: center !important;
-        }       
-
-        /* .switch-input:disabled {
-            background-color: #99c1d5 !important;
-            cursor: not-allowed; 
-        } 
-        */
-
-        /* Aumenta o z-index do segundo modal */
-        .modal.fade {
-        z-index: 1050; /* z-index padrão do Bootstrap 4 */
-        }
-
-        #modal2.modal.fade.show {
-        z-index: 1060; /* Maior z-index para garantir que o modal 2 sobreponha o modal 1 */
-        }        
-
-    </style>    
-
-    <!-- Custom CSS para efeito de Hover nas guias -->
-    <style>
-    .custom-tabs-hover .nav-item {
-        border: 1px solid #ddd;
-        border-radius: 5px 5px 0 0;
-        margin-right: 5px;
-    }
-
-    .custom-tabs-hover .nav-link {
-        border: none;
-        border-radius: 5px 5px 0 0;
-        padding: 10px 15px;
-        color: #007bff;
-        background-color: #f8f9fa;
-        transition: all 0.3s ease;
-    }
-
-    .custom-tabs-hover .nav-link.active {
-        color: #fff;
-        background-color: #007bff;
-        border: 1px solid #007bff;
-    }
-
-    .custom-tabs-hover .nav-link:hover {
-        background-color: #e9ecef;
-        border-color: #007bff;
-    }
-
-    .tab-content {
-        border: 1px solid #ddd;
-        border-radius: 0 0 5px 5px;
-        padding: 20px;
-        background-color: #f9f9f9;
-    }
-    </style>
-
 @stop
 
 @section('content_body')
@@ -293,52 +234,53 @@
                 </div>
                 <div class="modal-body">
                     <!-- Nav tabs -->
-                    <ul class="nav nav-tabs custom-tabs-hover" id="myTab" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active" id="perfil-tab" data-toggle="tab" href="#perfil" role="tab" aria-controls="perfil" aria-selected="true">Detalhes</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="autorizacoes-tab" data-toggle="tab" href="#autorizacoes" role="tab" aria-controls="autorizacoes" aria-selected="false">Autorizações</a>
-                    </li>
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="perfil-tab" data-toggle="tab" href="#perfil" role="tab" aria-controls="perfil" aria-selected="true">Detalhes</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="autorizacoes-tab" data-toggle="tab" href="#autorizacoes" role="tab" aria-controls="autorizacoes" aria-selected="false">Autorizações</a>
+                        </li>
                     </ul>
                     <!-- Tab panes -->
-                    <div class="tab-content" id="myTabContent">
-                        <div class="tab-pane fade show active" id="perfil" role="tabpanel" aria-labelledby="perfil-tab">
+                    <div class="tab-content" id="tab-perfil">
+                        <div class="tab-pane fade show active" id="perfil" role="tabpanel" aria-labelledby="perfil-tab" style="padding-top: 20px;">
 
+                            <fieldset class="border p-2">
+                                <form id="formPerfilEditar" name="formPerfilEditar" action="javascript:void(0)" class="form-horizontal" method="post">
 
-                            <form id="formPerfilEditar" name="formPerfilEditar" action="javascript:void(0)" class="form-horizontal" method="post">
+                                    <div class="form-group input-group-sm" id="form-group-id">
+                                        <label class="form-label">ID</label>
+                                        <input class="form-control" value="" type="text" id="id" name="id" placeholder="" readonly data-toggle="tooltip" title="ID do Perfil de Acesso">
+                                    </div>
 
-                                <div class="form-group input-group-sm" id="form-group-id">
-                                    <label class="form-label">ID</label>
-                                    <input class="form-control" value="" type="text" id="id" name="id" placeholder="" readonly data-toggle="tooltip" title="ID do Perfil de Acesso">
-                                </div>
+                                    <div class="form-group input-group-sm">
+                                        <label class="form-label">Nome</label>
+                                        <input class="form-control" disabled value="" type="text" id="nome" name="nome" placeholder="" data-toggle="tooltip" title="Informe o Nome do Perfil de Acesso" >
+                                        <div id="error-nome" class="error invalid-feedback" style="display: none;"></div>
+                                    </div>
 
-                                <div class="form-group input-group-sm">
-                                    <label class="form-label">Nome</label>
-                                    <input class="form-control" disabled value="" type="text" id="nome" name="nome" placeholder="" data-toggle="tooltip" title="Informe o Nome do Perfil de Acesso" >
-                                    <div id="error-nome" class="error invalid-feedback" style="display: none;"></div>
-                                </div>
+                                    <div class="form-group input-group-sm">
+                                        <label class="form-label">Descrição</label>
+                                        <textarea class="form-control" disabled id="descricao" name="descricao" placeholder="" data-toggle="tooltip" title="Informe a Descrição do Perfil de Acesso" rows="4"></textarea>
+                                        <div id="error-descricao" class="error invalid-feedback" style="display: none;"></div>
+                                    </div>
 
-                                <div class="form-group input-group-sm">
-                                    <label class="form-label">Descrição</label>
-                                    <textarea class="form-control" disabled id="descricao" name="descricao" placeholder="" data-toggle="tooltip" title="Informe a Descrição do Perfil de Acesso" rows="4"></textarea>
-                                    <div id="error-descricao" class="error invalid-feedback" style="display: none;"></div>
-                                </div>
+                                    <div class="form-group input-group-sm">
+                                        <label class="form-label" data-toggle="tooltip" title="Marcar se o Perfil de Acesso está Ativo">Ativo</label>
+                                        <label class="switch">
+                                            <input type="checkbox" disabled id="ativo" name="ativo" class="switch-input" data-toggle="tooltip" title="Marcar se  o Perfil de Acesso está Ativo">
+                                            <span class="switch-label" data-on="SIM" data-off="NÃO"></span>
+                                            <span class="switch-handle"></span>
+                                        </label>
+                                        <div id="error-ativo" class="error invalid-feedback" style="display: none;"></div>
+                                    </div>
 
-                                <div class="form-group input-group-sm">
-                                    <label class="form-label" data-toggle="tooltip" title="Marcar se o Perfil de Acesso está Ativo">Ativo</label>
-                                    <label class="switch">
-                                        <input type="checkbox" disabled id="ativo" name="ativo" class="switch-input" data-toggle="tooltip" title="Marcar se  o Perfil de Acesso está Ativo">
-                                        <span class="switch-label" data-on="SIM" data-off="NÃO"></span>
-                                        <span class="switch-handle"></span>
-                                    </label>
-                                    <div id="error-ativo" class="error invalid-feedback" style="display: none;"></div>
-                                </div>
-
-                            </form>
+                                </form>
+                            </fieldset>
                         
-                    </div>  
-                    <div class="tab-pane fade" id="autorizacoes" role="tabpanel" aria-labelledby="autorizacoes-tab">
+                        </div>  
+                        <div class="tab-pane fade" id="autorizacoes" role="tabpanel" aria-labelledby="autorizacoes-tab" style="padding-top: 20px;">
                         
                             <fieldset class="border p-2">
                                 <legend class="w-auto h5">Ações Autorizadas</legend>
@@ -367,7 +309,7 @@
                                 </div>
                             </fieldset>
 
-                    </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -385,25 +327,17 @@
 @stop
 
 @push('css')
+{{-- You can add AdminLTE customizations here --}}
 <style type="text/css">
 
-    {{-- You can add AdminLTE customizations here --}}
-
-    /* Aumenta o z-index do segundo modal */
-    .modal.fade {
-        z-index: 1050; /* z-index padrão do Bootstrap 4 */
-    }
-
-    #alertModal.modal.fade.show {
-        z-index: 1060; /* Maior z-index para garantir que o modal 2 sobreponha o modal 1 */
-    }         
+    /* .switch-input:disabled { */
+        .switch-input:checked {
+        background-color: #a8cddf !important;
+        cursor: not-allowed; 
+    } 
 
 </style>
 @endpush
-
-@section('js')
-    <script> console.log("Hi, I'm using the Laravel-AdminLTE package!"); </script>
-@stop
 
 @push('js')
 <script type="text/javascript">
